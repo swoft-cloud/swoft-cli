@@ -12,8 +12,8 @@
   "license": "Apache-2.0",
   "require": {
     "php": ">7.1.0",
-    "swoft/component": "2.0.x-dev as 2.0",
-    "swoft/console": "2.0.x-dev as 2.0"
+    "swoft/component": "2.0.x-dev",
+    "swoft/console": "2.0.x-dev"
   },
   "autoload": {
     "psr-4": {
@@ -33,7 +33,7 @@
     },
     "component": {
       "type": "git",
-      "url": "git@github.com:swoft-cloud/swoft-component.git"
+      "url": "https://github.com/ulue/swoft-component.git"
     },
     "event": {
       "type": "git",
@@ -42,6 +42,10 @@
     "stdlib": {
       "type": "git",
       "url": "https://github.com/swoft-cloud/swoft-stdlib.git"
+    },
+    "console": {
+      "type": "git",
+      "url": "https://github.com/swoft-cloud/swoft-console.git"
     }
   },
   "scripts": {
