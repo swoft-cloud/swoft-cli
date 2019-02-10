@@ -12,8 +12,14 @@
   "license": "Apache-2.0",
   "require": {
     "php": ">7.1.0",
+    "ext-json": "*",,
+    "ext-mbstring": "*",
     "swoft/component": "2.0.x-dev",
-    "swoft/console": "2.0.x-dev"
+    "swoft/console": "2.0.x-dev",
+    "toolkit/cli-utils": "^1.0"
+  },
+  "require-dev": {
+    "swoft/swoole-ide-helper": "dev-master"
   },
   "autoload": {
     "psr-4": {
