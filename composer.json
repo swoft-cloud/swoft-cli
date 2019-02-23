@@ -15,7 +15,6 @@
     "ext-json": "*",,
     "ext-mbstring": "*",
     "swoft/component": "2.0.x-dev",
-    "swoft/console": "2.0.x-dev",
     "toolkit/cli-utils": "^1.0"
   },
   "require-dev": {
@@ -40,18 +39,6 @@
     "component": {
       "type": "git",
       "url": "https://github.com/ulue/swoft-component.git"
-    },
-    "event": {
-      "type": "git",
-      "url": "https://github.com/swoft-cloud/swoft-event.git"
-    },
-    "stdlib": {
-      "type": "git",
-      "url": "https://github.com/swoft-cloud/swoft-stdlib.git"
-    },
-    "console": {
-      "type": "git",
-      "url": "https://github.com/swoft-cloud/swoft-console.git"
     }
   },
   "scripts": {

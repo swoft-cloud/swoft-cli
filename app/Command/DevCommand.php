@@ -1,9 +1,12 @@
 <?php
 
-namespace Swoft\Devtool\Command;
+namespace Swoft\Cli\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
-use Swoft\Console\Helper\ConsoleUtil;
+use Swoft\Console\Annotation\Mapping\CommandArgument;
+use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\Annotation\Mapping\CommandOption;
+use Swoft\Console\Helper\Interact;
 use Swoft\Console\Input\Input;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Sys;
@@ -30,14 +33,14 @@ class DevCommand
 
     /**
      * Used to publish the internal resources of the module to the 'public' directory
-     * @Arguments
-     *   srcDir   The source assets directory path. eg. `@vendor/some/lib/assets`
-     *   dstDir   The dist directory component name.(default is `@root/public/some/lib`)
-     * @Options
-     *   -y, --yes BOOL      Do not confirm when execute publish. default is: <info>False</info>
-     *   -f, --force BOOL    Force override all exists file.(default: <info>False</info>)
-     * @Example
-     *   {fullCommand} swoft/devtool
+     *
+     * @CommandMapping(example="{fullCommand} swoft/devtool")
+     *
+     * @CommandArgument("srcDir", desc="The source assets directory path. eg. `@vendor/some/lib/assets`")
+     * @CommandArgument("dstDir", desc="The dist directory component name", default="@root/public/some/lib")
+     * @CommandOption("yes", short="y", desc="Do not confirm when execute publish", default=false)
+     * @CommandOption("force", short="f", desc="Force override all exists file", default=false)
+     *
      * @param Input $input
      * @return int
      * @throws \InvalidArgumentException
@@ -62,7 +65,7 @@ class DevCommand
                 \output()->colored('missing arguments!', 'warning');
             }
 
-            list($assetDir, $targetDir) = $config[$assetDir];
+            [$assetDir, $targetDir] = $config[$assetDir];
         }
 
         $assetDir = \alias($assetDir);
@@ -73,7 +76,7 @@ class DevCommand
         if ($force && \is_dir($targetDir)) {
             \output()->writeln("Will delete the old assets: $targetDir");
 
-            list($code, , $error) = Sys::run("rm -rf $targetDir");
+            [$code, , $error] = Sys::run("rm -rf $targetDir");
 
             if ($code !== 0) {
                 \output()->colored("Delete dir $targetDir is failed!", 'error');
@@ -88,7 +91,7 @@ class DevCommand
 
         \output()->writeln("Will run shell command:\n $command");
 
-        if (!$yes && !ConsoleUtil::confirm('Ensure continue?', true)) {
+        if (!$yes && !Interact::confirm('Ensure continue?')) {
             \output()->writeln(' Quit, Bye!');
 
             return 0;

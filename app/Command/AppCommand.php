@@ -4,9 +4,8 @@ namespace Swoft\Devtool\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
-use Swoft\Console\Output\Output;
-use Swoft\Stdlib\Helper\ComposerHelper;
 use Swoft\Console\Helper\PharCompiler;
+use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Sys;
 
@@ -21,8 +20,6 @@ class AppCommand
     /**
      * init the project, will create runtime dirs
      *
-     * @Usage
-     *   {fullCommand} [arguments] [options]
      * @CommandMapping("init")
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
@@ -32,7 +29,7 @@ class AppCommand
         \output()->writeln('Create runtime directories: ', false);
 
         $tmpDir = \alias('@runtime');
-        $dirs = [
+        $dirs   = [
             'logs',
             'uploadfiles'
         ];
@@ -48,20 +45,21 @@ class AppCommand
      * Print current system environment information
      * @CommandMapping()
      * @param Output $output
-     * @throws \RuntimeException
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
      */
-    public function env(Output $output)
+    public function env(Output $output): void
     {
         $buffer = [];
         // sys info
         $info = [
             "<bold>System environment info</bold>\n",
-            'OS' => \PHP_OS,
-            'Php version' => \PHP_VERSION,
+            'OS'             => \PHP_OS,
+            'Php version'    => \PHP_VERSION,
             'Swoole version' => \SWOOLE_VERSION,
-            'Swoft version' => App::version(),
-            'AppName' => \APP_NAME,
-            'BasePath' => \BASE_PATH,
+            'Swoft version'  => \Swoft::VERSION,
+            'AppName'        => \config('name'),
+            'BasePath'       => \BASE_PATH,
         ];
 
         foreach ($info as $name => $value) {
@@ -70,7 +68,7 @@ class AppCommand
                 continue;
             }
 
-            $name = \str_pad($name, 35);
+            $name     = \str_pad($name, 35);
             $buffer[] = \sprintf('  <comment>%s</comment> %s', $name, $value);
         }
 
@@ -83,7 +81,7 @@ class AppCommand
      * @param Output $output
      * @throws \RuntimeException
      */
-    public function check(Output $output)
+    public function check(Output $output): void
     {
         // env check
         list($code, $return,) = Sys::run('php --ri swoole');
@@ -91,20 +89,25 @@ class AppCommand
 
         $list = [
             "<bold>Runtime environment check</bold>\n",
-            'PHP version is greater than 7?' => self::wrap(PHP_VERSION_ID > 70000, 'current is ' . \PHP_VERSION),
-            'Swoole extension is installed?' => self::wrap(\extension_loaded('swoole')),
-            'Swoole version is greater than 2.1?' => self::wrap(\version_compare(SWOOLE_VERSION, '2.1.0', '>='), 'current is ' . \SWOOLE_VERSION),
-            'Swoole async redis is enabled?' => self::wrap($asyncRdsEnabled),
-            'Swoole coroutine is enabled?' => self::wrap(\class_exists('Swoole\Coroutine', false)),
+            'PHP version is greater than 7.1?'    => self::wrap(PHP_VERSION_ID > 70100, 'current is ' . \PHP_VERSION),
+            'Swoole extension is installed?'      => self::wrap(\extension_loaded('swoole')),
+            'Swoole version is greater than 2.1?' => self::wrap(\version_compare(SWOOLE_VERSION, '2.1.0', '>='),
+                'current is ' . \SWOOLE_VERSION),
+            'Swoole async redis is enabled?'      => self::wrap($asyncRdsEnabled),
+            'Swoole coroutine is enabled?'        => self::wrap(\class_exists('Swoole\Coroutine', false)),
             "\n<bold>Extensions that conflict with 'swoole'</bold>\n",
-            ' - zend' => self::wrap(!\extension_loaded('zend'), 'Please disabled it, otherwise swoole will be affected!', true),
-            ' - xdebug' => self::wrap(!\extension_loaded('xdebug'), 'Please disabled it, otherwise swoole will be affected!', true),
-            ' - xhprof' => self::wrap(!\extension_loaded('xhprof'), 'Please disabled it, otherwise swoole will be affected!', true),
-            ' - blackfire' => self::wrap(!\extension_loaded('blackfire'), 'Please disabled it, otherwise swoole will be affected!', true),
+            ' - zend'                             => self::wrap(!\extension_loaded('zend'),
+                'Please disabled it, otherwise swoole will be affected!', true),
+            ' - xdebug'                           => self::wrap(!\extension_loaded('xdebug'),
+                'Please disabled it, otherwise swoole will be affected!', true),
+            ' - xhprof'                           => self::wrap(!\extension_loaded('xhprof'),
+                'Please disabled it, otherwise swoole will be affected!', true),
+            ' - blackfire'                        => self::wrap(!\extension_loaded('blackfire'),
+                'Please disabled it, otherwise swoole will be affected!', true),
         ];
 
         $buffer = [];
-        $pass = $total = 0;
+        $pass   = $total = 0;
 
         foreach ($list as $question => $value) {
             if (\is_int($question)) {
@@ -128,15 +131,15 @@ class AppCommand
     }
 
     /**
-     * @param $condition
-     * @param string|null $msg
-     * @param bool $showOnFalse
+     * @param bool   $condition
+     * @param string $msg
+     * @param bool   $showOnFalse
      * @return array
      */
-    public static function wrap($condition, string $msg = null, $showOnFalse = false): array
+    public static function wrap($condition, string $msg = '', $showOnFalse = false): array
     {
         $result = $condition ? '<success>Yes</success>' : '<red>No</red>';
-        $des = '';
+        $des    = '';
 
         if ($msg) {
             if ($showOnFalse) {
@@ -165,7 +168,7 @@ class AppCommand
         }
 
         $buffer = [];
-        $map = DevToolHelper::parseComposerLockFile($lockFile);
+        $map    = DevToolHelper::parseComposerLockFile($lockFile);
 
         foreach ($map as $item) {
             $buffer[] = \sprintf(
@@ -203,14 +206,14 @@ class AppCommand
      */
     public function pack(): int
     {
-        $time = \microtime(1);
+        $time    = \microtime(1);
         $workDir = input()->getPwd();
 
         $dir = \input()->getOpt('dir') ?: $workDir;
         $cpr = $this->configCompiler($dir);
 
         // $counter = 0;
-        $refresh = input()->getOpt('refresh');
+        $refresh  = input()->getOpt('refresh');
         $pharFile = $workDir . '/' . (\input()->sameOpt(['o', 'output']) ?: 'app.phar');
 
         // use fast build
@@ -277,7 +280,7 @@ class AppCommand
         }
 
         $basePath = \input()->getPwd();
-        $file = \realpath($basePath . '/' . $path);
+        $file     = \realpath($basePath . '/' . $path);
 
         if (!file_exists($file)) {
             \output()->writeln("<error>The phar file not exists. File: $file</error>");
@@ -285,7 +288,7 @@ class AppCommand
             return 1;
         }
 
-        $dir = input()->getSameOpt(['d', 'dir']) ?: $basePath;
+        $dir       = input()->getSameOpt(['d', 'dir']) ?: $basePath;
         $overwrite = input()->getOpt('overwrite');
 
         if (!is_dir($dir)) {
