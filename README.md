@@ -1,11 +1,23 @@
 # swoft cli
 
-Swoft cli library.
+🛠️ CLI tool application for quick use swoft.
 
-## Insatll
+- Quick create new application skeleton
+- Quick create new component skeleton
+- Monitor file changes of the user's swoft project and automatically restart the server
+- Generate swoft class: http controller, ws controller, model and more class
+- More features ...
+
+## Install
 
 ```bash
-wget swoft-cli.phar
+wget swoftcli.phar
+```
+
+Move to ENV path:
+
+```bash
+mv swoftcli.phar /usr/local/bin
 ```
 
 ## License

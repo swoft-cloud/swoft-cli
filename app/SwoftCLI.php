@@ -6,7 +6,6 @@ use Swoft\SwoftApplication;
 
 /**
  * Class SwoftCLI
- * @package Swoft\Cli
  */
 class SwoftCLI extends SwoftApplication
 {

@@ -8,14 +8,14 @@
     "swoft-cli",
     "swoft"
   ],
-  "description": "microservice framework base on swoole",
+  "description": "micro-service framework base on swoole",
   "license": "Apache-2.0",
   "require": {
     "php": ">7.1.0",
-    "ext-json": "*",,
+    "ext-json": "*",
     "ext-mbstring": "*",
-    "swoft/component": "2.0.x-dev",
-    "toolkit/cli-utils": "^1.0"
+    "toolkit/cli-utils": "^1.0",
+    "swoft/component": "2.0.x-dev"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master"
@@ -23,8 +23,7 @@
   "autoload": {
     "psr-4": {
       "Swoft\\Cli\\": "app/"
-    },
-    "files": []
+    }
   },
   "autoload-dev": {
     "psr-4": {

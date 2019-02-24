@@ -1,11 +1,13 @@
 <?php
 
-namespace Swoft\Devtool\Command;
+namespace Swoft\Cli\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\PharCompiler;
 use Swoft\Console\Output\Output;
+use Swoft\Stdlib\Helper\ComposerHelper;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Sys;
 
@@ -13,7 +15,6 @@ use Swoft\Stdlib\Helper\Sys;
  * There are some help command for application[<cyan>built-in</cyan>]
  *
  * @Command(coroutine=false)
- * @package Swoft\Devtool\Command
  */
 class AppCommand
 {
@@ -131,28 +132,6 @@ class AppCommand
     }
 
     /**
-     * @param bool   $condition
-     * @param string $msg
-     * @param bool   $showOnFalse
-     * @return array
-     */
-    public static function wrap($condition, string $msg = '', $showOnFalse = false): array
-    {
-        $result = $condition ? '<success>Yes</success>' : '<red>No</red>';
-        $des    = '';
-
-        if ($msg) {
-            if ($showOnFalse) {
-                $des = !$condition ? " ($msg)" : '';
-            } else {
-                $des = " ($msg)";
-            }
-        }
-
-        return [(bool)$condition, $result . $des];
-    }
-
-    /**
      * List all swoft components
      * @CommandMapping()
      * @param Output $output
@@ -168,7 +147,7 @@ class AppCommand
         }
 
         $buffer = [];
-        $map    = DevToolHelper::parseComposerLockFile($lockFile);
+        $map    = ComposerHelper::parseLockFile($lockFile);
 
         foreach ($map as $item) {
             $buffer[] = \sprintf(
@@ -186,18 +165,20 @@ class AppCommand
 
     /**
      * pack project to a phar package
-     * @CommandMapping()
-     * @Usage {fullCommand} [--dir DIR] [--output FILE]
-     * @Options
-     *   --dir STRING            Setting the project directory for packing.
-     *                            default is current work-dir.(<comment>{workDir}</comment>)
-     *   --fast BOOL             Fast build. only add modified files by <cyan>git status -s</cyan>
-     *   --refresh BOOL          Whether build vendor folder files on phar file exists(<comment>False</comment>)
-     *   -o,--output STRING      Setting the output file name(<comment>app.phar</comment>)
-     *   -c, --config STRING     Use the defined config for build phar.
-     * @Example
-     *   {fullCommand}                                  Pack current dir to a phar file.
-     *   {fullCommand} --dir vendor/swoft/devtool       Pack the specified dir to a phar file.
+     * @CommandMapping(
+     *     usage="{fullCommand} [--dir DIR] [--output FILE]",
+     *     example="
+     *      {fullCommand} Pack current dir to a phar file.
+     *      {fullCommand} --dir vendor/swoft/devtool       Pack the specified dir to a phar file.
+     *     "
+     *  )
+     *
+     * @CommandOption("dir", desc="Setting the project directory for packing, default is current work-dir", default="{workDir}")
+     * @CommandOption("fast", desc="Fast build. only add modified files by <cyan>git status -s</cyan>")
+     * @CommandOption("refresh", desc="Whether build vendor folder files on phar file exists", default=false)
+     * @CommandOption("output", short="o", desc="Setting the output file name", default="app.phar")
+     * @CommandOption("config", short="c", desc="Use the defined config for build phar")
+     *
      * @return int
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
@@ -259,14 +240,14 @@ class AppCommand
 
     /**
      * unpack a phar package to a directory
-     * @CommandMapping()
-     * @Usage {fullCommand} -f FILE [-d DIR]
-     * @Options
-     *   -f, --file STRING   The packed phar file path
-     *   -d, --dir STRING    The output dir on extract phar package.
-     *   -y, --yes BOOL      Whether display goon tips message.
-     *   --overwrite BOOL    Whether overwrite exists files on extract phar
-     * @Example {fullCommand} -f myapp.phar -d var/www/app
+     * @CommandMapping(
+     *     usage="{fullCommand} -f FILE [-d DIR]",
+     *     example="{fullCommand} -f myapp.phar -d var/www/app"
+     *  )
+     * @CommandOption("file", short="f", desc="The packed phar file path", type="string")
+     * @CommandOption("dir", short="d", desc="The output dir on extract phar package", type="string")
+     * @CommandOption("yes", short="y", desc="Whether display goon tips message", type="string")
+     * @CommandOption("overwrite", desc="Whether overwrite exists files on extract phar", type="bool")
      * @return int
      * @throws \RuntimeException
      * @throws \BadMethodCallException
@@ -284,7 +265,6 @@ class AppCommand
 
         if (!file_exists($file)) {
             \output()->writeln("<error>The phar file not exists. File: $file</error>");
-
             return 1;
         }
 
@@ -327,5 +307,27 @@ class AppCommand
         }
 
         throw new \InvalidArgumentException("The phar build config file not found. File: $configFile");
+    }
+
+    /**
+     * @param bool   $condition
+     * @param string $msg
+     * @param bool   $showOnFalse
+     * @return array
+     */
+    private static function wrap($condition, string $msg = '', $showOnFalse = false): array
+    {
+        $result = $condition ? '<success>Yes</success>' : '<red>No</red>';
+        $des    = '';
+
+        if ($msg) {
+            if ($showOnFalse) {
+                $des = !$condition ? " ($msg)" : '';
+            } else {
+                $des = " ($msg)";
+            }
+        }
+
+        return [(bool)$condition, $result . $des];
     }
 }
