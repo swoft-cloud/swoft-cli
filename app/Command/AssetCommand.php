@@ -16,7 +16,7 @@ use Swoft\Stdlib\Helper\Sys;
  * @package Swoft\Devtool\Command
  * @Command(coroutine=false)
  */
-class DevCommand
+class AssetCommand
 {
     /**
      * @return array
