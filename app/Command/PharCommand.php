@@ -11,7 +11,7 @@ use Swoft\Stdlib\Helper\Dir;
 /**
  * There are some help command for application[<cyan>built-in</cyan>]
  *
- * @Command(coroutine=false)
+ * @Command()
  */
 class PharCommand
 {

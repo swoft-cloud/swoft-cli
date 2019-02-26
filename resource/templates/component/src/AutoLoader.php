@@ -1,6 +1,6 @@
-<?php
+<?php declare(strict_types=1);
 
-namespace Swoft\Cli;
+namespace {PKG_NAMESPCE};
 
 use Swoft\Helper\ComposerJSON;
 use Swoft\SwoftComponent;

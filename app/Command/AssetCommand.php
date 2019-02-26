@@ -14,7 +14,7 @@ use Swoft\Stdlib\Helper\Sys;
 /**
  * Some commands for application dev[<cyan>built-in</cyan>]
  * @package Swoft\Devtool\Command
- * @Command(coroutine=false)
+ * @Command()
  */
 class AssetCommand
 {
