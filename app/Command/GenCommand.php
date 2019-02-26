@@ -2,12 +2,10 @@
 
 namespace Swoft\Cli\Command;
 
-use Swoft\App;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
-use Swoft\Console\Helper\ConsoleUtil;
 use Swoft\Console\Helper\Interact;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
@@ -39,11 +37,11 @@ class GenCommand
      * Generate CLI command controller class
      *
      * @CommandMapping(alias="cmd", example="
-     * <info>{fullCommand} demo</info>     Gen DemoCommand class to `@app/Command`
+     * <info>{fullCommand} demo</info>     Gen DemoCommand class to command dir
      * ")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
-     * @CommandArgument("dir", desc="The class file save dir. default: <info>@app/Command</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Command")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="command.stub")
@@ -69,13 +67,14 @@ class GenCommand
 
     /**
      * Generate HTTP controller class
+     *
      * @CommandMapping(alias="ctrl", example="
-     * <info>{fullCommand} demo --prefix /demo -y</info>          Gen DemoController class to `@app/Controller`
-     * <info>{fullCommand} user --prefix /users --rest</info>     Gen UserController class to `@app/Controller`(RESTFul type)
+     * <info>{fullCommand} demo --prefix /demo -y</info>          Gen DemoController class to http Controller dir
+     * <info>{fullCommand} user --prefix /users --rest</info>     Gen UserController class to http Controller dir(RESTFul type)
      * ")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
-     * @CommandArgument("dir", desc="The class file save dir. default: <info>@app/Controller</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Http/Controller")
      *
      * @CommandOption("rest", type="string", desc="The class will contains CURD actions", default=false)
      * @CommandOption("prefix", type="string", desc="The route prefix for the controller, default is class name", default="string")
@@ -94,7 +93,7 @@ class GenCommand
     {
         [$config, $data] = $this->collectInfo($in, $out, [
             'suffix'      => 'Controller',
-            'namespace'   => 'App\\Controller',
+            'namespace'   => 'App\\Http\\Controller',
             'tplFilename' => 'controller',
         ]);
 
@@ -109,22 +108,19 @@ class GenCommand
     }
 
     /**
-     * Generate WebSocket controller class
-     * @Usage {fullCommand} CLASS_NAME SAVE_DIR [--option ...]
-     * @Arguments
-     *   name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
-     *   dir        The class file save dir(default: <info>@app/WebSocket</info>)
-     * @Options
-     *   -y, --yes BOOL             No need to confirm when performing file writing. default is: <info>False</info>
-     *   -o, --override BOOL        Force override exists file. default is: <info>False</info>
-     *   -n, --namespace STRING     The class namespace. default is: <info>App\WebSocket</info>
-     *   --prefix STRING            The route path for the controller. default is class name
-     *   --suffix STRING            The class name suffix. default is: <info>Controller</info>
-     *   --tpl-file STRING          The template file name. default is: <info>ws-controller.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} echo --prefix /echo -y</info>         Gen EchoController class to `@app/WebSocket`
-     *   <info>{fullCommand} chat --prefix /chat</info>     Gen ChatController class to `@app/WebSocket`
+     * Generate WebSocket module/controller class
+     * @CommandMapping("ws", example="
+     * <info>{fullCommand} echo --prefix /echo -y</info>   Gen EchoController class to WebSocket dir
+     * <info>{fullCommand} chat --prefix /chat</info>      Gen ChatController class to WebSocket dir
+     * ")
+     *
+     * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/WebSocket")
+     *
+     * @CommandOption("prefix", type="string", desc="The route prefix for the websocket, default is class name", default="string")
+     * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="ws-module.stub")
+     *
      * @return int
      * @param Input  $in
      * @param Output $out
@@ -148,9 +144,10 @@ class GenCommand
 
     /**
      * Generate RPC service class
+     * @CommandMapping("rpc-ctrl")
      * @return int
      */
-    public function rpcService(): int
+    public function rpcController(): int
     {
         \output()->writeln('un-completed ...');
         return 0;
@@ -158,19 +155,16 @@ class GenCommand
 
     /**
      * Generate an event listener class
-     * @Usage {fullCommand} CLASS_NAME SAVE_DIR [--option ...]
-     * @Arguments
-     *   name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
-     *   dir        The class file save dir(default: <info>@app/Listener</info>)
-     * @Options
-     *   -y, --yes BOOL             No need to confirm when performing file writing. default is: <info>False</info>
-     *   -o, --override BOOL        Force override exists file. default is: <info>False</info>
-     *   -n, --namespace STRING     The class namespace. default is: <info>App\Listener</info>
-     *   --suffix STRING            The class name suffix. default is: <info>Listener</info>
-     *   --tpl-file STRING          The template file name. default is: <info>listener.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} demo</info>     Gen DemoListener class to `@app/Listener`
+     * @CommandMapping(example="
+     * <info>{fullCommand} demo</info>     Gen DemoListener class to Listener dir
+     * ")
+     *
+     * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Listener")
+     *
+     * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="listener.stub")
+     *
      * @param Input  $in
      * @param Output $out
      * @return int
@@ -180,7 +174,7 @@ class GenCommand
      */
     public function listener(Input $in, Output $out): int
     {
-        list($config, $data) = $this->collectInfo($in, $out, [
+        [$config, $data] = $this->collectInfo($in, $out, [
             'suffix'      => 'Listener',
             'namespace'   => 'App\\Listener',
             'tplFilename' => 'listener',
@@ -191,19 +185,16 @@ class GenCommand
 
     /**
      * Generate HTTP middleware class
-     * @Usage {fullCommand} CLASS_NAME SAVE_DIR [--option ...]
-     * @Arguments
-     *   name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
-     *   dir        The class file save dir(default: <info>@app/Middlewares</info>)
-     * @Options
-     *   -y, --yes BOOL             No need to confirm when performing file writing. default is: <info>False</info>
-     *   -o, --override BOOL        Force override exists file. default is: <info>False</info>
-     *   -n, --namespace STRING     The class namespace. default is: <info>App\Middlewares</info>
-     *   --suffix STRING            The class name suffix. default is: <info>Middleware</info>
-     *   --tpl-file STRING          The template file name. default is: <info>middleware.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} demo</info>     Gen DemoMiddleware class to `@app/Middlewares`
+     * @CommandMapping(example="
+     * <info>{fullCommand} demo</info>     Gen DemoMiddleware class to Middleware dir
+     * ")
+     *
+     * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Middleware")
+     *
+     * @CommandOption("suffix", type="string", desc="The class name suffix", default="Middleware")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="middleware.stub")
+     *
      * @param Input  $in
      * @param Output $out
      * @return int
@@ -213,30 +204,27 @@ class GenCommand
      */
     public function middleware(Input $in, Output $out): int
     {
-        list($config, $data) = $this->collectInfo($in, $out, [
+        [$config, $data] = $this->collectInfo($in, $out, [
             'suffix'      => 'Middleware',
-            'namespace'   => 'App\\Middlewares',
+            'namespace'   => 'App\\Http\\Middleware',
             'tplFilename' => 'middleware',
         ]);
 
-        return $this->writeFile('@app/Middlewares', $data, $config, $out);
+        return $this->writeFile('@app/Middleware', $data, $config, $out);
     }
 
     /**
      * Generate user task class
-     * @Usage {fullCommand} CLASS_NAME SAVE_DIR [--option ...]
-     * @Arguments
-     *   name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
-     *   dir        The class file save dir(default: <info>@app/Tasks</info>)
-     * @Options
-     *   -y, --yes BOOL             No need to confirm when performing file writing. default is: <info>False</info>
-     *   -o, --override BOOL        Force override exists file. default is: <info>False</info>
-     *   -n, --namespace STRING     The class namespace. default is: <info>App\Tasks</info>
-     *   --suffix STRING            The class name suffix. default is: <info>Task</info>
-     *   --tpl-file STRING          The template file name. default is: <info>task.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} demo</info>     Gen DemoTask class to `@app/Tasks`
+     * @CommandMapping(example="
+     * <info>{fullCommand} demo</info>     Gen DemoTask class to Task dir
+     * ")
+     *
+     * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Task")
+     *
+     * @CommandOption("suffix", type="string", desc="The class name suffix", default="Task")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="task.stub")
+     *
      * @param Input  $in
      * @param Output $out
      * @return int
@@ -246,30 +234,28 @@ class GenCommand
      */
     public function task(Input $in, Output $out): int
     {
-        list($config, $data) = $this->collectInfo($in, $out, [
+        [$config, $data] = $this->collectInfo($in, $out, [
             'suffix'      => 'Task',
-            'namespace'   => 'App\\Tasks',
+            'namespace'   => 'App\\Task',
             'tplFilename' => 'task',
         ]);
 
-        return $this->writeFile('@app/Tasks', $data, $config, $out);
+        return $this->writeFile('@app/Task', $data, $config, $out);
     }
 
     /**
      * Generate user custom process class
-     * @Usage {fullCommand} CLASS_NAME SAVE_DIR [--option ...]
-     * @Arguments
-     *   name       The class name, don't need suffix and ext.(eg. <info>demo</info>)
-     *   dir        The class file save dir(default: <info>@app/Process</info>)
-     * @Options
-     *   -y, --yes BOOL             No need to confirm when performing file writing. default is: <info>False</info>
-     *   -o, --override BOOL        Force override exists file. default is: <info>False</info>
-     *   -n, --namespace STRING     The class namespace. default is: <info>App\Process</info>
-     *   --suffix STRING            The class name suffix. default is: <info>Process</info>
-     *   --tpl-file STRING          The template file name. default is: <info>process.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} demo</info>     Gen DemoProcess class to `@app/Process`
+     *
+     * @CommandMapping(example="
+     * <info>{fullCommand} demo</info>     Gen DemoProcess class to Process dir
+     * ")
+     *
+     * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
+     * @CommandArgument("dir", desc="The class file save dir", default="@app/Process")
+     *
+     * @CommandOption("suffix", type="string", desc="The class name suffix", default="Process")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="process.stub")
+     *
      * @param Input  $in
      * @param Output $out
      * @return int
@@ -288,30 +274,26 @@ class GenCommand
         return $this->writeFile('@app/Process', $data, $config, $out);
     }
 
-
     /**
-     * Generate entity class
-     * @Usage {fullCommand} -d test [--option ...]
+     * Generate entity class by database table schema
+     * @CommandMapping(example="
+     * <info>{fullCommand} -d test</info>     Gen DemoProcess class to Model/Entity
+     * ")
      *
-     * @Options
-     *   -d, --database STRING      Must to set database. `,` symbol is used  to separated by multiple databases
-     *   -i, --include STRING       Set the included tables, `,` symbol is used  to separated by multiple tables. default is: <info>all tables</info>
-     *   -e, --exclude STRING       Set the excluded tables, `,` symbol is used  to separated by multiple tables. default is: <info>empty</info>
-     *   -p, --path STRING          Specified entity generation path, default is: <info>@app/Models/Entity</info>
-     *   --driver STRING            Specify database driver(mysql/pgsql/mongodb), default is: <info>mysql</info>
-     *   --table-prefix STRING      Specify the table prefix that needs to be removed, default is: <info>empty</info>
-     *   --field-prefix STRING      Specify the field prefix that needs to be removed, default is: <info>empty</info>
-     *   --tpl-file STRING          The template file name. default is: <info>entity.stub</info>
-     *   --tpl-dir STRING           The template file dir path.(default: devtool/res/templates)
-     * @Example
-     *   <info>{fullCommand} -d test</info>     Gen DemoProcess class to `@app/Models/Entity`
+     * @CommandOption("database", short="d", desc="Must to set database. `,` symbol is used  to separated by multi databases", mode=Command::OPT_REQUIRED)
+     * @CommandOption("include", short="i", desc="Set the included tables, `,` symbol is used  to separated by multiple tables", default="all tables")
+     * @CommandOption("exclude", short="e", desc="Set the excluded tables, `,` symbol is used  to separated by multiple tables")
+     * @CommandOption("path", short="p", desc="Specified entity generation path", default="@app/Model/Entity")
+     * @CommandOption("driver", desc="Specify database driver(mysql/pgsql/mongodb)", default="mysql", type="string")
+     * @CommandOption("table-prefix", desc="Specify the table prefix that needs to be removed", type="string")
+     * @CommandOption("field-prefix", desc="Specify the field prefix that needs to be removed", type="string")
+     * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="entity.stub")
      *
      * @param Input  $in
      * @param Output $out
      *
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
+     * @throws \ReflectionException
+     * @throws \Swoft\Bean\Exception\ContainerException
      */
     public function entity(Input $in, Output $out): void
     {
@@ -319,7 +301,7 @@ class GenCommand
             'test',
             '',
             '',
-            '@app/Models/Entity',
+            '@app/Model/Entity',
             'mysql',
             '',
             '',
