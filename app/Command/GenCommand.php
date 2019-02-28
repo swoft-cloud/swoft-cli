@@ -14,7 +14,7 @@ use Swoft\Devtool\Model\Logic\EntityLogic;
 
 /**
  * Generate some common application template classes
- * @Command()
+ * @Command(alias="generate")
  *
  * @CommandOption("yes", short="y", desc="No need to confirm when performing file writing", default=false)
  * @CommandOption("override", short="o", desc="Force override exists file", default=false)
@@ -109,7 +109,7 @@ class GenCommand
 
     /**
      * Generate WebSocket module/controller class
-     * @CommandMapping("ws", example="
+     * @CommandMapping(alias="ws", example="
      * <info>{fullCommand} echo --prefix /echo -y</info>   Gen EchoController class to WebSocket dir
      * <info>{fullCommand} chat --prefix /chat</info>      Gen ChatController class to WebSocket dir
      * ")
@@ -144,7 +144,7 @@ class GenCommand
 
     /**
      * Generate RPC service class
-     * @CommandMapping("rpc-ctrl")
+     * @CommandMapping(alias="rpc-ctrl")
      * @return int
      */
     public function rpcController(): int
@@ -185,7 +185,7 @@ class GenCommand
 
     /**
      * Generate HTTP middleware class
-     * @CommandMapping(example="
+     * @CommandMapping(alias="middle", example="
      * <info>{fullCommand} demo</info>     Gen DemoMiddleware class to Middleware dir
      * ")
      *

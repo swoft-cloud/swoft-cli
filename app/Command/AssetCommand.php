@@ -12,7 +12,7 @@ use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Sys;
 
 /**
- * Some commands for application dev[<cyan>built-in</cyan>]
+ * Some commands for application developing
  * @package Swoft\Devtool\Command
  * @Command()
  */
