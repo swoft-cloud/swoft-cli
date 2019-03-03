@@ -16,8 +16,8 @@ use Swoft\Devtool\Model\Logic\EntityLogic;
  * Generate some common application template classes
  * @Command(alias="generate")
  *
- * @CommandOption("yes", short="y", desc="No need to confirm when performing file writing", default=false)
- * @CommandOption("override", short="o", desc="Force override exists file", default=false)
+ * @CommandOption("yes", short="y", desc="No need to confirm when performing file writing", default=false, type="bool")
+ * @CommandOption("override", short="o", desc="Force override exists file", default=false, type="bool")
  * @CommandOption("namespace", short="n", desc="The class namespace", default="App\Command")
  * @CommandOption("tpl-dir", type="string", desc="The class namespace", default="built-in")
  */

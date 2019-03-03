@@ -9,7 +9,7 @@ use Swoft\SwoftApplication;
  */
 class SwoftCLI extends SwoftApplication
 {
-    protected function init()
+    protected function init(): void
     {
         \Swoft::setAlias('@swoftcli', \dirname(__DIR__));
     }
