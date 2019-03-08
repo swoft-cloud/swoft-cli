@@ -9,28 +9,24 @@ use Swoft\Console\Helper\PharCompiler;
 use Swoft\Stdlib\Helper\Dir;
 
 /**
- * There are some help command for application[<cyan>built-in</cyan>]
+ * There are some command for help package application
  *
  * @Command()
  */
 class PharCommand
 {
     /**
-     * pack project to a phar package
-     * @CommandMapping(
-     *     usage="{fullCommand} [--dir DIR] [--output FILE]",
-     *     example="
-     *      {fullCommand} Pack current dir to a phar file.
-     *      {fullCommand} --dir vendor/swoft/devtool       Pack the specified dir to a phar file.
-     *     "
-     *  )
+     * pack project codes to a phar package
+     * @CommandMapping(usage="{fullCommand} [--dir DIR] [--output FILE]",)
      *
      * @CommandOption("dir", desc="Setting the project directory for packing, default is current work-dir", default="{workDir}")
      * @CommandOption("fast", desc="Fast build. only add modified files by <cyan>git status -s</cyan>")
      * @CommandOption("refresh", desc="Whether build vendor folder files on phar file exists", default=false)
      * @CommandOption("output", short="o", desc="Setting the output file name", default="app.phar")
      * @CommandOption("config", short="c", desc="Use the defined config for build phar")
-     *
+     * @example
+     *  {fullCommand}                               Pack current dir to a phar file.
+     *  {fullCommand} --dir vendor/swoft/devtool    Pack the specified dir to a phar file.
      * @return int
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException

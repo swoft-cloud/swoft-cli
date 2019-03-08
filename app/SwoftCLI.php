@@ -9,8 +9,17 @@ use Swoft\SwoftApplication;
  */
 class SwoftCLI extends SwoftApplication
 {
-    protected function init(): void
+    protected function afterInit(): void
     {
         \Swoft::setAlias('@swoftcli', \dirname(__DIR__));
+    }
+
+    public function getCLoggerConfig(): array
+    {
+        $config = parent::getCLoggerConfig();
+        // disable
+        $config['enable'] = false;
+
+        return $config;
     }
 }
