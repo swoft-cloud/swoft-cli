@@ -2,17 +2,31 @@
 
 namespace Swoft\Cli\Command;
 
+use Swoft\Console\Annotation\Mapping\Command;
+use Swoft\Console\Annotation\Mapping\CommandMapping;
+
 /**
- * Class SystemCommand
- * - CPU vmstat, sar top, htop, nmon, mpstat
- * - MEMORY free ps -aux
- * - IO iostat, ss, netstat, iptraf, iftop, lsof
- * @package Swoft\Cli\Command
+ * Provide some system information commands
+ * - CPU
+ * - MEMORY
+ * - DISK
+ * - IO
+ * @Command()
  */
 class SystemCommand
 {
+    public function top(): void
+    {
+
+    }
+
+    public function uptime(): void
+    {
+
+    }
+
     /*****************************************************************************
-     * helper methods for: CPU
+     * CPU stat methods: vmstat, htop
      ****************************************************************************/
 
     public function vmstat(): void
@@ -39,7 +53,7 @@ class SystemCommand
     }
 
     /*****************************************************************************
-     * helper methods for: MEMORY
+     * MEMORY stat methods: free
      ****************************************************************************/
 
     public function ps(): void
@@ -53,7 +67,7 @@ class SystemCommand
     }
 
     /*****************************************************************************
-     * helper methods for: IO
+     * IO stat methods: ss, lsof, iftop, iptraf, netstat, iostat, iotop, ioprofile
      ****************************************************************************/
 
     public function ss(): void
@@ -76,12 +90,40 @@ class SystemCommand
 
     }
 
-    public function iostat(): void
+    public function netstat(): void
     {
 
     }
 
-    public function netstat(): void
+    /**
+     * @CommandMapping(alias="iotop")
+     */
+    public function ioTop(): void
+    {
+
+    }
+
+    /**
+     * @CommandMapping(alias="iostat")
+     */
+    public function ioStat(): void
+    {
+
+    }
+
+    /**
+     * @CommandMapping(alias="ioprofile")
+     */
+    public function ioProfile(): void
+    {
+
+    }
+
+    /*****************************************************************************
+     * DISK stat methods: df, fdisk
+     ****************************************************************************/
+
+    public function df(): void
     {
 
     }
