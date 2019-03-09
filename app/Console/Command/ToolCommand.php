@@ -1,6 +1,6 @@
 <?php
 
-namespace Swoft\Cli\Command;
+namespace Swoft\Cli\Console\Command;
 
 class ToolCommand
 {

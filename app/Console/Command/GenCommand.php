@@ -1,6 +1,6 @@
 <?php
 
-namespace Swoft\Cli\Command;
+namespace Swoft\Cli\Console\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
