@@ -16,6 +16,7 @@
     "ext-mbstring": "*",
     "monolog/monolog": "^1.24",
     "swoft/component": "2.0.x-dev",
+    "swoft/devtool": "2.0.x-dev",
     "seld/phar-utils": "^1.0",
     "toolkit/cli-utils": "^1.0",
     "text/template": "~2.3"
