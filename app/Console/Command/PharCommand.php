@@ -2,16 +2,16 @@
 
 namespace Swoft\Cli\Console\Command;
 
+use Swoft\Console\Advanced\PharCompiler;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
-use Swoft\Console\Helper\PharCompiler;
 use Swoft\Stdlib\Helper\Dir;
 
 /**
  * There are some command for help package application
  *
- * @Command()
+ * @Command(coroutine=false)
  */
 class PharCommand
 {
@@ -28,10 +28,7 @@ class PharCommand
      *  {fullCommand}                               Pack current dir to a phar file.
      *  {fullCommand} --dir vendor/swoft/devtool    Pack the specified dir to a phar file.
      * @return int
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws \BadMethodCallException
-     * @throws \RuntimeException
+     * @throws \Exception
      */
     public function pack(): int
     {

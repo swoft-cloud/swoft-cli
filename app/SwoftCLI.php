@@ -11,6 +11,8 @@ class SwoftCLI extends SwoftApplication
 {
     protected function afterInit(): void
     {
+        parent::afterInit();
+
         \ini_set('pcre.jit', 'off');
 
         \Swoft::setAlias('@swoftcli', \dirname(__DIR__));

@@ -3,35 +3,47 @@
  * The is a config file for compile phar package.
  * User: Inhere
  * Date: 2018/1/26 22:11
- * @var \Swoft\Console\Helper\PharCompiler $compiler
+ * @var \Swoft\Console\Advanced\PharCompiler $compiler
  */
 
 // config
 $compiler
     ->stripComments(true)
     ->setShebang(true)
+    ->addSuffix(['.tpl', '.json'])
     ->addExclude([
         'test',
+        'tests',
+        'Tests',
+        'runtime',
     ])
     ->addFile([
         'LICENSE',
         'composer.json',
         'README.md',
-        'test/bootstrap.php',
+        'bin/bootstrap.php',
     ])
     ->setCliIndex('bin/swoftcli')
     // ->setWebIndex('web/index.php')
     // ->setVersionFile('config/config.php')
 ;
 
-// Console 下的 Command Controller 命令类不去除注释，注释上是命令帮助信息
-$compiler->setStripFilter(function ($file) {
+$stripDirs = [
+    'psr/',
+    'nikic/',
+    'monolog/',
+];
+
+// Swoft 相关都不用去除注释
+$compiler->setStripFilter(function ($file) use ($stripDirs) {
     /** @var \SplFileInfo $file */
     $path = $file->getPath();
 
-    if (\strpos($path, 'swoft')) {
-        return false;
+    foreach ($stripDirs as $dir) {
+        if (\strpos($path, $dir)) {
+            return true;
+        }
     }
 
-    return false === \strpos($file->getFilename(), 'Command.php');
+    return false;
 });
