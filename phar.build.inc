@@ -11,7 +11,7 @@ $compiler
     ->stripComments(true)
     ->setShebang(true)
     ->addSuffix(['.tpl', '.json'])
-    ->addExclude([
+    ->addExcludeDir([
         'test',
         'tests',
         'Tests',
@@ -32,12 +32,14 @@ $stripDirs = [
     'psr/',
     'nikic/',
     'monolog/',
+    'symfony/',
+    'toolkit/',
 ];
 
-// Swoft 相关都不用去除注释
+// Swoft 相关都不能去除注释
 $compiler->setStripFilter(function ($file) use ($stripDirs) {
     /** @var \SplFileInfo $file */
-    $path = $file->getPath();
+    $path = $file->getPathname();
 
     foreach ($stripDirs as $dir) {
         if (\strpos($path, $dir)) {

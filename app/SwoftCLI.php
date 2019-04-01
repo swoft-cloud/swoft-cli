@@ -22,7 +22,7 @@ class SwoftCLI extends SwoftApplication
     {
         $config = parent::getCLoggerConfig();
         // disable
-        $config['enable'] = false;
+        $config['enable'] = true;
 
         return $config;
     }

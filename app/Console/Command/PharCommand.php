@@ -76,7 +76,7 @@ class PharCommand
             ' - Phar size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
             ' - Pack Time: ' . round(microtime(1) - $time, 3) . ' s',
             ' - Pack File: ' . $cpr->getCounter(),
-            ' - Commit ID: ' . $cpr->getVersion(),
+            ' - Commit ID: ' . $cpr->getLastCommit(),
         ];
         \output()->writeln(\implode("\n", $info));
 
