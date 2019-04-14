@@ -14,12 +14,9 @@
     "php": ">7.1.0",
     "ext-json": "*",
     "ext-mbstring": "*",
-    "monolog/monolog": "^1.24",
-    "swoft/component": "2.0.x-dev",
-    "swoft/devtool": "2.0.x-dev",
+    "text/template": "~2.3",
     "seld/phar-utils": "^1.0",
-    "toolkit/cli-utils": "^1.0",
-    "text/template": "~2.3"
+    "swoft/component": "2.0.x-dev as 2.0"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master"
@@ -37,11 +34,11 @@
   "repositories": {
     "packagist": {
       "type": "composer",
-      "url": "https://packagist.phpcomposer.com"
+      "url": "https://packagist.laravel-china.org"
     },
-    "component": {
-      "type": "git",
-      "url": "https://github.com/ulue/swoft-component.git"
+    "0": {
+      "type": "path",
+      "url": "/Users/inhere/Workspace/php/swoft/swoftv2/swoft-component"
     }
   },
   "scripts": {
