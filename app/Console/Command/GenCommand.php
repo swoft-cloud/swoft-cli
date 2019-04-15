@@ -1,7 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Swoft\Cli\Console\Command;
 
+use Swoft\Cli\Helper\FileGenerator;
+use Swoft\Cli\Model\Logic\EntityLogic;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
@@ -9,8 +11,6 @@ use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Interact;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
-use Swoft\Devtool\FileGenerator;
-use Swoft\Devtool\Model\Logic\EntityLogic;
 
 /**
  * Generate some common application template classes
