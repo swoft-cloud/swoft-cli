@@ -4,6 +4,7 @@ namespace Swoft\Cli\Console\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\Helper\Show;
 
 /**
  * Provide some system information commands
@@ -11,10 +12,29 @@ use Swoft\Console\Annotation\Mapping\CommandMapping;
  * - MEMORY
  * - DISK
  * - IO
- * @Command()
+ * @Command(alias="sys")
  */
 class SystemCommand
 {
+    /**
+     * @CommandMapping()
+     */
+    public function info(): void
+    {
+        $info = [
+            // "<bold>System environment info</bold>\n",
+            'OS'             => \PHP_OS,
+            'Php version'    => \PHP_VERSION,
+            'Swoole version' => \SWOOLE_VERSION,
+            'Swoft version'  => \Swoft::VERSION,
+            // 'App Name'       => \APP_NAME,
+            'Base Path'      => \BASE_PATH,
+            // 'CPU number'      => \swoole_cpu_num(),
+        ];
+
+        Show::aList($info, 'System Environment');
+    }
+
     public function top(): void
     {
 

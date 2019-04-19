@@ -13,6 +13,7 @@ class SwoftCLI extends SwoftApplication
     {
         parent::afterInit();
 
+        // fix: on php73 preg_* error
         \ini_set('pcre.jit', 'off');
 
         \Swoft::setAlias('@swoftcli', \dirname(__DIR__));
@@ -22,7 +23,7 @@ class SwoftCLI extends SwoftApplication
     {
         $config = parent::getCLoggerConfig();
         // disable
-        $config['enable'] = true;
+        $config['enable'] = (int)\env('SWOFT_DEBUG', 0) > 0;
 
         return $config;
     }

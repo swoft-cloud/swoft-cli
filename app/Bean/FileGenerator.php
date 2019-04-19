@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Swoft\Cli\Helper;
+namespace Swoft\Cli\Bean;
 
 use Leuffen\TextTemplate\TextTemplate;
 

@@ -4,8 +4,10 @@ use Swoft\Http\Server\Swoole\RequestListener;
 use Swoft\Server\Swoole\SwooleEvent;
 
 return [
-    'cliApp'     => [
-
+    'cliRouter'     => [
+        'idAliases' => [
+            // 'run' => 'serve:run'
+        ],
     ],
     'httpServer' => [
         /** @see \Swoft\Http\Server\HttpServer::$setting */
