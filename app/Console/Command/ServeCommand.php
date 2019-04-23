@@ -48,7 +48,12 @@ class ServeCommand
     /**
      * @var string
      */
-    private $targetDir;
+    private $targetPath;
+
+    /**
+     * @var string[]
+     */
+    private $watchDir = ['app', 'config'];
 
     /**
      * @var string
@@ -61,6 +66,8 @@ class ServeCommand
      */
     private function collectInfo(Input $input): bool
     {
+        $workDir = $input->getPwd();
+
         $this->debug  = $input->getBoolOpt('debug');
         $this->phpBin = $input->getOpt('php-bin');
 
@@ -69,22 +76,33 @@ class ServeCommand
             $interval = 3;
         }
 
-        $this->interval  = $interval;
-        $this->binFile   = $input->getSameOpt(['bin-file', 'b']);
-        $this->startCmd  = $input->getSameOpt(['start-cmd', 'c']);
-        $this->targetDir = $pwd = $input->getArg('targetDir', $input->getPwd());
+        $this->interval = $interval;
+        $this->binFile  = $input->getSameOpt(['bin-file', 'b']);
+        $this->startCmd = $input->getSameOpt(['start-cmd', 'c']);
+
+        if ($nameString = $input->getSameOpt(['watch-dir', 'w'])) {
+            $this->watchDir = \explode(',', \str_replace(' ', '', $nameString));
+        }
+
+        $this->targetPath = $input->getArg('targetPath', $workDir);
+
+        // Parse relative path
+        if (\strpos($this->targetPath, '..') !== false) {
+            $this->targetPath = \realpath($this->targetPath);
+        }
 
         // $cmd = "php {$pwd}/bin/swoft http:start";
         // $cmd = "php {$pwd}/bin/swoftcli sys:info";
-        $this->entryFile = $this->targetDir . '/' . $this->binFile;
+        $this->entryFile = $this->targetPath . '/' . $this->binFile;
 
         \output()->aList([
             'current pid' => \getmypid(),
-            'current dir' => $pwd,
-            'target dir'  => $this->targetDir,
-            'entry file'  => $this->targetDir,
-            'execute cmd' => \sprintf('%s %s/%s %s', $this->phpBin, $this->targetDir, $this->binFile, $this->startCmd),
-        ], 'information');
+            'current dir' => $workDir,
+            'target path' => $this->targetPath,
+            'watch dirs'  => $this->watchDir,
+            'entry file'  => $this->entryFile,
+            'execute cmd' => \sprintf('%s %s/%s %s', $this->phpBin, $this->targetPath, $this->binFile, $this->startCmd),
+        ], 'Some information');
 
         if (!\file_exists($this->entryFile)) {
             Show::liteError('The swoft entry file is not exist');
@@ -98,14 +116,26 @@ class ServeCommand
      * Start the swoft server and monitor the file changes to restart the server
      *
      * @CommandMapping()
-     * @CommandArgument("targetDir", desc="want watch swoft project path, default is currnt dir", type="directory")
-     * @CommandOption("interval", desc="Interval time for watch files, unit is seconds", type="integer", default=3)
-     * @CommandOption(
-     *     "bin-file", short="b", type="string", default="bin/swoft", desc="Entry file for the swoft project"
+     * @CommandArgument("targetPath", type="path",
+     *     desc="Your swoft project path, default is current work directory"
+     * )
+     * @CommandOption("interval", type="integer", default=3,
+     *     desc="Interval time for watch files, unit is seconds"
      * )
      * @CommandOption(
-     *     "start-cmd", short="c", type="string", default="http:start", desc="the server startup command to be executed"
+     *     "bin-file", short="b", type="string", default="bin/swoft",
+     *     desc="Entry file for the swoft project"
      * )
+     * @CommandOption(
+     *     "start-cmd", short="c", type="string", default="http:start",
+     *     desc="the server startup command to be executed"
+     * )
+     * @CommandOption(
+     *     "watch", short="w", default="app,config", type="directories",
+     *     desc="List of directories you want to watch, relative the <cyan>targetPath</cyan>"
+     * )
+     * @example
+     *   {binFile} run -c ws:start -b bin/swoft /path/to/php/swoft
      * @param Input $input
      */
     public function run(Input $input): void
@@ -114,15 +144,19 @@ class ServeCommand
             return;
         }
 
-        $pid = $this->startServer();
+        $fileName = 'server-' . \md5($this->entryFile) . '.id';
+        $watchDirs = \array_map(function ($name) {
+            return $this->targetPath . '/' . $name;
+        }, $this->watchDir);
 
-        Show::info('PID is ' . $pid);
-
-        $mw = new ModifyWatcher(\Swoft::getAlias('@runtime/serve-hash.id'));
-        $mw->watchDir($this->targetDir . '/config');
+        // $mw = new ModifyWatcher(Sys::getTempDir() . '/' . $fileName));
+        $mw = new ModifyWatcher(\Swoft::getAlias('@runtime/' . $fileName));
+        $mw->watchDir($watchDirs);
         $mw->initHash();
 
-        Show::aList($mw->getWatchDir(), 'watched dir');
+        Show::aList($mw->getWatchDir(), 'watched directories');
+
+        $pid = $this->startServer();
 
         while ($pid > 0) {
             if ($ret = Process::wait(false)) {
@@ -142,7 +176,7 @@ class ServeCommand
             }
 
             if ($mw->isChanged()) {
-                Show::info(\time() . ': file changed!');
+                Show::info(\date('Y/m/d H:i:s') . ': file changed!');
                 Show::aList($mw->getChangedInfo(), 'modify info');
                 Show::info('will restart server');
 
@@ -153,7 +187,7 @@ class ServeCommand
 
                 $pid = $this->startServer();
             } elseif ($this->debug) {
-                Show::info(\time() . ': no change!');
+                Show::info(\date('Y/m/d H:i:s') . ': no change!');
             }
 
             \sleep($this->interval);

@@ -8,6 +8,7 @@ runtime/
 vendor/
 temp/
 *.lock
+*.phar
 .phpintel/
 .env
 .DS_Store

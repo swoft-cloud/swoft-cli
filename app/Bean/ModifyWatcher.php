@@ -178,7 +178,14 @@ final class ModifyWatcher
      */
     public function initHash(): void
     {
+        $fastMode = $this->fastMode;
+        // set to false
+        $this->fastMode = false;
+
         $this->isChanged();
+
+        // revert
+        $this->fastMode = $fastMode;
         $this->changedInfo = [];
     }
 
@@ -266,19 +273,13 @@ final class ModifyWatcher
             return; // end calc
         }
 
-        // TODO replace scandir to glob or SPLFile*
-        $files = \scandir($watchDir, 0);
-
-        foreach ($files as $fName) {
-            if ($fName === '.' || $fName === '..') {
-                continue;
-            }
-
-            $path = $watchDir . '/' . $fName;
+        // TODO replace `scandir` to `glob` or `SPLFile*`
+        foreach (\glob($watchDir . '/*') as $path) {
+            $name = \basename($path);
 
             // Recursive directory
             if (\is_dir($path)) {
-                if ($this->isWatchDir($fName)) {
+                if ($this->isWatchDir($name)) {
                     $this->collectDirMd5($path);
                 }
 
@@ -286,7 +287,7 @@ final class ModifyWatcher
             }
 
             // Check file
-            if (!$this->isWatchFile($fName)) {
+            if (!$this->isWatchFile($name)) {
                 continue;
             }
 

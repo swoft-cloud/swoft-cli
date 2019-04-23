@@ -13,9 +13,13 @@ $compiler
     ->addSuffix(['.tpl', '.json'])
     ->addExcludeDir([
         'test',
+        'doc',
+        'docs',
         'tests',
         'Tests',
+        'example',
         'runtime',
+        'swoole-ide-helper',
     ])
     ->addFile([
         'LICENSE',
