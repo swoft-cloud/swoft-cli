@@ -2,7 +2,7 @@
 
 namespace Swoft\Cli\Console\Command;
 
-use Swoft\Cli\Helper\FileGenerator;
+use Swoft\Cli\Bean\FileGenerator;
 use Swoft\Cli\Model\Logic\EntityLogic;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
@@ -14,6 +14,7 @@ use Swoft\Console\Output\Output;
 
 /**
  * Generate some common application template classes
+ *
  * @Command(alias="generate")
  *
  * @CommandOption("yes", short="y", desc="No need to confirm when performing file writing", default=false, type="bool")
@@ -36,15 +37,15 @@ class GenCommand
     /**
      * Generate CLI command controller class
      *
-     * @CommandMapping(alias="cmd", example="
-     * <info>{fullCommand} demo</info>     Gen DemoCommand class to command dir
-     * ")
+     * @CommandMapping(alias="cmd")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Command")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="command.stub")
+     * @example <info>{fullCommand} demo</info>     Gen DemoCommand class to command dir
+     *
      * @param Input  $in
      * @param Output $out
      * @return int
@@ -68,10 +69,7 @@ class GenCommand
     /**
      * Generate HTTP controller class
      *
-     * @CommandMapping(alias="ctrl", example="
-     * <info>{fullCommand} demo --prefix /demo -y</info>          Gen DemoController class to http Controller dir
-     * <info>{fullCommand} user --prefix /users --rest</info>     Gen UserController class to http Controller dir(RESTFul type)
-     * ")
+     * @CommandMapping(alias="ctrl")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Http/Controller")
@@ -81,9 +79,15 @@ class GenCommand
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="command.stub")
      *
+     * @example
+     *   <info>{fullCommand} demo --prefix /demo -y</info>      Gen DemoController class to http controller dir
+     *   <info>{fullCommand} user --prefix /users --rest</info> Gen UserController class to http controller dir(RESTFul)
+     *
      * @return int
+     *
      * @param Input  $in
      * @param Output $out
+     *
      * @return int
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
@@ -109,10 +113,7 @@ class GenCommand
 
     /**
      * Generate WebSocket module/controller class
-     * @CommandMapping(alias="ws", example="
-     * <info>{fullCommand} echo --prefix /echo -y</info>   Gen EchoController class to WebSocket dir
-     * <info>{fullCommand} chat --prefix /chat</info>      Gen ChatController class to WebSocket dir
-     * ")
+     * @CommandMapping(alias="ws")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/WebSocket")
@@ -120,6 +121,9 @@ class GenCommand
      * @CommandOption("prefix", type="string", desc="The route prefix for the websocket, default is class name", default="string")
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="ws-module.stub")
+     * @example
+     * <info>{fullCommand} echo --prefix /echo -y</info>   Gen EchoController class to WebSocket dir
+     * <info>{fullCommand} chat --prefix /chat</info>      Gen ChatController class to WebSocket dir
      *
      * @return int
      * @param Input  $in
@@ -155,15 +159,14 @@ class GenCommand
 
     /**
      * Generate an event listener class
-     * @CommandMapping(example="
-     * <info>{fullCommand} demo</info>     Gen DemoListener class to Listener dir
-     * ")
+     * @CommandMapping()
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Listener")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="listener.stub")
+     * @example <info>{fullCommand} demo</info>     Gen DemoListener class to Listener dir
      *
      * @param Input  $in
      * @param Output $out
@@ -185,15 +188,15 @@ class GenCommand
 
     /**
      * Generate HTTP middleware class
-     * @CommandMapping(alias="middle", example="
-     * <info>{fullCommand} demo</info>     Gen DemoMiddleware class to Middleware dir
-     * ")
+     * @CommandMapping(alias="middle")
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Middleware")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Middleware")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="middleware.stub")
+     * @example
+     * <info>{fullCommand} demo</info>     Gen DemoMiddleware class to Middleware dir
      *
      * @param Input  $in
      * @param Output $out
@@ -215,15 +218,15 @@ class GenCommand
 
     /**
      * Generate user task class
-     * @CommandMapping(example="
-     * <info>{fullCommand} demo</info>     Gen DemoTask class to Task dir
-     * ")
+     * @CommandMapping()
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Task")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Task")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="task.stub")
+     * @example
+     * <info>{fullCommand} demo</info>     Gen DemoTask class to Task dir
      *
      * @param Input  $in
      * @param Output $out
@@ -246,15 +249,16 @@ class GenCommand
     /**
      * Generate user custom process class
      *
-     * @CommandMapping(example="
-     * <info>{fullCommand} demo</info>     Gen DemoProcess class to Process dir
-     * ")
+     * @CommandMapping()
      *
      * @CommandArgument("name", desc="The class name, don't need suffix and ext. eg: <info>demo</info>")
      * @CommandArgument("dir", desc="The class file save dir", default="@app/Process")
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Process")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="process.stub")
+     *
+     * @example
+     * <info>{fullCommand} demo</info>     Gen DemoProcess class to Process dir
      *
      * @param Input  $in
      * @param Output $out
@@ -276,9 +280,7 @@ class GenCommand
 
     /**
      * Generate entity class by database table schema
-     * @CommandMapping(example="
-     * <info>{fullCommand} -d test</info>     Gen DemoProcess class to Model/Entity
-     * ")
+     * @CommandMapping()
      *
      * @CommandOption("database", short="d", desc="Must to set database. `,` symbol is used  to separated by multi databases", mode=Command::OPT_REQUIRED)
      * @CommandOption("include", short="i", desc="Set the included tables, `,` symbol is used  to separated by multiple tables", default="all tables")
@@ -289,6 +291,8 @@ class GenCommand
      * @CommandOption("field-prefix", desc="Specify the field prefix that needs to be removed", type="string")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="entity.stub")
      *
+     * @example
+     * <info>{fullCommand} -d test</info>     Gen DemoProcess class to Model/Entity
      * @param Input  $in
      * @param Output $out
      *

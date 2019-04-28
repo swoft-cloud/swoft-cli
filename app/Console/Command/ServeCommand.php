@@ -14,6 +14,8 @@ use Swoole\Process;
 /**
  * Provide some commands for manage and watch swoft server project
  *
+ * @since 2.0
+ *
  * @Command(idAliases={"run": "serve:run"}, coroutine=false)
  * @CommandOption("debug", default=false, desc="open debug mode for display more detail", type="bool")
  * @CommandOption("php-bin", default="/usr/local/bin/php", desc="Custom the php bin file path", type="string")
