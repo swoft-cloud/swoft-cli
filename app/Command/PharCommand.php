@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Swoft\Cli\Console\Command;
+namespace Swoft\Cli\Command;
 
 use Swoft\Console\Advanced\PharCompiler;
 use Swoft\Console\Annotation\Mapping\Command;
@@ -30,6 +30,8 @@ class PharCommand
      * @example
      *   {fullCommand}                               Pack current dir to a phar file.
      *   {fullCommand} --dir vendor/swoft/devtool    Pack the specified dir to a phar file.
+     *
+     *   php -d phar.readonly=0 {binFile} phar:pack -o=scli.phar
      * @return int
      * @throws \Exception
      */

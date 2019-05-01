@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Swoft\Cli\Console\Command;
+namespace Swoft\Cli\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 
 /**
  * Class ClientCommand
- * @package Swoft\Cli\Console\Command
+ *
  * @Command()
  */
 class ClientCommand
