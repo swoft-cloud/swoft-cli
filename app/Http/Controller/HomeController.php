@@ -7,6 +7,7 @@ use Swoft\Http\Server\Annotation\Mapping\RequestMapping;
 
 /**
  * Class HomeController
+ *
  * @package Swoft\Cli\Http\Controller
  * @Controller("")
  */

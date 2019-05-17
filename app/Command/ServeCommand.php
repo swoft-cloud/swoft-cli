@@ -2,6 +2,7 @@
 
 namespace Swoft\Cli\Command;
 
+use Swoft;
 use Swoft\Cli\Bean\ModifyWatcher;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
@@ -10,6 +11,19 @@ use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
 use Swoole\Process;
+use function array_map;
+use function date;
+use function explode;
+use function file_exists;
+use function getmypid;
+use function md5;
+use function output;
+use function realpath;
+use function sleep;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function time;
 
 /**
  * Provide some commands for manage and watch swoft server project
@@ -64,6 +78,7 @@ class ServeCommand
 
     /**
      * @param Input $input
+     *
      * @return bool
      */
     private function collectInfo(Input $input): bool
@@ -83,30 +98,30 @@ class ServeCommand
         $this->startCmd = $input->getSameOpt(['start-cmd', 'c']);
 
         if ($nameString = $input->getSameOpt(['watch-dir', 'w'])) {
-            $this->watchDir = \explode(',', \str_replace(' ', '', $nameString));
+            $this->watchDir = explode(',', str_replace(' ', '', $nameString));
         }
 
         $this->targetPath = $input->getArg('targetPath', $workDir);
 
         // Parse relative path
-        if (\strpos($this->targetPath, '..') !== false) {
-            $this->targetPath = \realpath($this->targetPath);
+        if (strpos($this->targetPath, '..') !== false) {
+            $this->targetPath = realpath($this->targetPath);
         }
 
         // $cmd = "php {$pwd}/bin/swoft http:start";
         // $cmd = "php {$pwd}/bin/swoftcli sys:info";
         $this->entryFile = $this->targetPath . '/' . $this->binFile;
 
-        \output()->aList([
-            'current pid' => \getmypid(),
+        output()->aList([
+            'current pid' => getmypid(),
             'current dir' => $workDir,
             'target path' => $this->targetPath,
             'watch dirs'  => $this->watchDir,
             'entry file'  => $this->entryFile,
-            'execute cmd' => \sprintf('%s %s/%s %s', $this->phpBin, $this->targetPath, $this->binFile, $this->startCmd),
+            'execute cmd' => sprintf('%s %s/%s %s', $this->phpBin, $this->targetPath, $this->binFile, $this->startCmd),
         ], 'Some information');
 
-        if (!\file_exists($this->entryFile)) {
+        if (!file_exists($this->entryFile)) {
             Show::liteError('The swoft entry file is not exist');
             return false;
         }
@@ -136,9 +151,10 @@ class ServeCommand
      *     "watch", short="w", default="app,config", type="directories",
      *     desc="List of directories you want to watch, relative the <cyan>targetPath</cyan>"
      * )
+     * @param Input $input
+     *
      * @example
      *   {binFile} run -c ws:start -b bin/swoft /path/to/php/swoft
-     * @param Input $input
      */
     public function run(Input $input): void
     {
@@ -146,13 +162,13 @@ class ServeCommand
             return;
         }
 
-        $fileName = 'server-' . \md5($this->entryFile) . '.id';
-        $watchDirs = \array_map(function ($name) {
+        $fileName  = 'server-' . md5($this->entryFile) . '.id';
+        $watchDirs = array_map(function ($name) {
             return $this->targetPath . '/' . $name;
         }, $this->watchDir);
 
         // $mw = new ModifyWatcher(Sys::getTempDir() . '/' . $fileName));
-        $mw = new ModifyWatcher(\Swoft::getAlias('@runtime/' . $fileName));
+        $mw = new ModifyWatcher(Swoft::getAlias('@runtime/' . $fileName));
         $mw->watchDir($watchDirs);
         $mw->initHash();
 
@@ -178,7 +194,7 @@ class ServeCommand
             }
 
             if ($mw->isChanged()) {
-                Show::info(\date('Y/m/d H:i:s') . ': file changed!');
+                Show::info(date('Y/m/d H:i:s') . ': file changed!');
                 Show::aList($mw->getChangedInfo(), 'modify info');
                 Show::info('will restart server');
 
@@ -189,10 +205,10 @@ class ServeCommand
 
                 $pid = $this->startServer();
             } elseif ($this->debug) {
-                Show::info(\date('Y/m/d H:i:s') . ': no change!');
+                Show::info(date('Y/m/d H:i:s') . ': no change!');
             }
 
-            \sleep($this->interval);
+            sleep($this->interval);
         }
     }
 
@@ -216,7 +232,7 @@ class ServeCommand
         // SIGTERM = 15
         $signal    = 15;
         $timeout   = 5;
-        $startTime = \time();
+        $startTime = time();
 
         // retry stop if not stopped.
         while (true) {
@@ -231,7 +247,7 @@ class ServeCommand
             }
 
             // Has been timeout
-            if ((\time() - $startTime) >= $timeout) {
+            if ((time() - $startTime) >= $timeout) {
                 $ok = false;
                 Show::error('Stop sever is failed');
                 break;
@@ -239,7 +255,7 @@ class ServeCommand
 
             // Try kill process
             $ok = Process::kill($pid, $signal);
-            \sleep(1);
+            sleep(1);
         }
 
         return $ok;

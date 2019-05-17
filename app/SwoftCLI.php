@@ -2,7 +2,11 @@
 
 namespace Swoft\Cli;
 
+use Swoft;
+use Swoft\Stdlib\Helper\Sys;
 use Swoft\SwoftApplication;
+use function dirname;
+use function ini_set;
 
 /**
  * Class SwoftCLI
@@ -13,10 +17,12 @@ class SwoftCLI extends SwoftApplication
     {
         parent::afterInit();
 
-        // fix: on php73 preg_* error
-        \ini_set('pcre.jit', 'off');
+        $this->setRuntimePath(Sys::getTempDir());
 
-        \Swoft::setAlias('@swoftcli', \dirname(__DIR__));
+        // fix: on php73 preg_* error
+        ini_set('pcre.jit', 'off');
+
+        Swoft::setAlias('@swoftcli', dirname(__DIR__));
     }
 
     public function getCLoggerConfig(): array

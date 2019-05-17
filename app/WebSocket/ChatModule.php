@@ -2,6 +2,7 @@
 
 namespace Swoft\Cli\WebSocket;
 
+use function server;
 use Swoft\Http\Message\Request;
 use Swoft\WebSocket\Server\Annotation\Mapping\OnOpen;
 use Swoft\WebSocket\Server\Annotation\Mapping\WsModule;
@@ -25,6 +26,6 @@ class ChatModule
      */
     public function onOpen(Request $request, int $fd): void
     {
-        \server()->push($fd, 'welcome');
+        server()->push($fd, 'welcome');
     }
 }

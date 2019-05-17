@@ -2,12 +2,23 @@
 
 namespace Swoft\Cli\Command;
 
+use BadMethodCallException;
+use Exception;
+use InvalidArgumentException;
+use RuntimeException;
 use Swoft\Console\Advanced\PharCompiler;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
 use Swoft\Stdlib\Helper\Dir;
+use function filesize;
+use function input;
+use function is_file;
+use function microtime;
+use function output;
+use function realpath;
+use function round;
 
 /**
  * There are some command for help package application
@@ -27,22 +38,22 @@ class PharCommand
      * @CommandOption("refresh", desc="Whether build vendor folder files on phar file exists", default=false)
      * @CommandOption("output", short="o", desc="Setting the output file name", type="string", default="app.phar")
      * @CommandOption("config", short="c", type="string", desc="Use the defined config for build phar")
+     * @return int
+     * @throws Exception
      * @example
      *   {fullCommand}                               Pack current dir to a phar file.
      *   {fullCommand} --dir vendor/swoft/devtool    Pack the specified dir to a phar file.
      *
      *   php -d phar.readonly=0 {binFile} phar:pack -o=scli.phar
-     * @return int
-     * @throws \Exception
      */
     public function pack(): int
     {
-        $startAt = \microtime(true);
-        $workDir = \input()->getPwd();
-        $outFile = \input()->sameOpt(['o', 'output']) ?: 'app.phar';
+        $startAt  = microtime(true);
+        $workDir  = input()->getPwd();
+        $outFile  = input()->sameOpt(['o', 'output']) ?: 'app.phar';
         $pharFile = $workDir . '/' . $outFile;
 
-        $dir = \input()->getOpt('dir') ?: $workDir;
+        $dir = input()->getOpt('dir') ?: $workDir;
 
         Show::aList([
             'work dir'  => $workDir,
@@ -53,29 +64,27 @@ class PharCommand
         $cpr = $this->configCompiler($dir);
 
         // $counter = 0;
-        $refresh  = \input()->getOpt('refresh');
+        $refresh = input()->getOpt('refresh');
 
         // use fast build
-        if (\input()->getOpt('fast')) {
+        if (input()->getOpt('fast')) {
             $cpr->setModifies($cpr->findChangedByGit());
 
-            \output()->liteInfo(
-                'Use fast build, will only pack changed or new files(by git status)'
-            );
+            output()->liteInfo('Use fast build, will only pack changed or new files(by git status)');
         }
 
-        \output()->info('Pack file to Phar ... ...');
+        output()->info('Pack file to Phar ... ...');
         $cpr->onError(function ($error) {
-            \output()->writeln("<warning>$error</warning>");
+            output()->writeln("<warning>$error</warning>");
         });
 
-        if (\input()->getOpt('debug')) {
+        if (input()->getOpt('debug')) {
             $cpr->onAdd(function ($path) {
-                \output()->writeln(" <info>+</info> $path");
+                output()->writeln(" <info>+</info> $path");
             });
 
             $cpr->on('skip', function (string $path, bool $isFile) {
-                \output()->writeln(" <red>-</red> $path" . ($isFile ? '[F]' : '[D]'));
+                output()->writeln(" <red>-</red> $path" . ($isFile ? '[F]' : '[D]'));
             });
         }
 
@@ -85,12 +94,12 @@ class PharCommand
         $info = [
             PHP_EOL . '<success>Phar Build Completed!</success>',
             " - Phar file: $pharFile",
-            ' - Phar size: ' . \round(\filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
-            ' - Pack Time: ' . \round(\microtime(true) - $startAt, 3) . ' s',
+            ' - Phar size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
+            ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
             ' - Pack File: ' . $cpr->getCounter(),
             ' - Commit ID: ' . $cpr->getLastCommit(),
         ];
-        \output()->writeln($info);
+        output()->writeln($info);
 
         return 0;
     }
@@ -102,24 +111,25 @@ class PharCommand
      * @CommandOption("dir", short="d", desc="The output dir on extract phar package", type="string")
      * @CommandOption("yes", short="y", desc="Whether display goon tips message", type="string")
      * @CommandOption("overwrite", desc="Whether overwrite exists files on extract phar", type="bool")
-     * @example {fullCommand} -f myapp.phar -d var/www/app
+     *
      * @return int
-     * @throws \RuntimeException
-     * @throws \BadMethodCallException
+     * @throws RuntimeException
+     * @throws BadMethodCallException
+     * @example {fullCommand} -f myapp.phar -d var/www/app
      */
     public function unpack(): int
     {
-        if (!$path = \input()->getSameOpt(['f', 'file'])) {
-            \output()->writeln("<error>Please input the phar file path by option '-f|--file'</error>");
+        if (!$path = input()->getSameOpt(['f', 'file'])) {
+            output()->writeln("<error>Please input the phar file path by option '-f|--file'</error>");
 
             return 1;
         }
 
-        $basePath = \input()->getPwd();
-        $file     = \realpath($basePath . '/' . $path);
+        $basePath = input()->getPwd();
+        $file     = realpath($basePath . '/' . $path);
 
         if (!file_exists($file)) {
-            \output()->writeln("<error>The phar file not exists. File: $file</error>");
+            output()->writeln("<error>The phar file not exists. File: $file</error>");
             return 1;
         }
 
@@ -130,30 +140,30 @@ class PharCommand
             Dir::make($dir);
         }
 
-        \output()->writeln("Now, begin extract phar file:\n $file \nto dir:\n $dir");
+        output()->writeln("Now, begin extract phar file:\n $file \nto dir:\n $dir");
 
         PharCompiler::unpack($file, $dir, null, $overwrite);
 
-        \output()->writeln("<success>OK, phar package have been extract to the dir: $dir</success>");
+        output()->writeln("<success>OK, phar package have been extract to the dir: $dir</success>");
 
         return 0;
     }
 
     /**
      * @param string $dir
+     *
      * @return PharCompiler
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     protected function configCompiler(string $dir): PharCompiler
     {
-        // config
         $compiler = new PharCompiler($dir);
 
         // config file.
         $configFile = input()->getSameOpt(['c', 'config']) ?: $dir . '/phar.build.inc';
 
-        if ($configFile && \is_file($configFile)) {
+        if ($configFile && is_file($configFile)) {
             require $configFile;
 
             $compiler->in($dir);
@@ -161,6 +171,6 @@ class PharCommand
             return $compiler;
         }
 
-        throw new \InvalidArgumentException("The phar build config file not found. File: $configFile");
+        throw new InvalidArgumentException("The phar build config file not found. File: $configFile");
     }
 }

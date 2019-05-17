@@ -2,6 +2,8 @@
 
 namespace Swoft\Cli\Command;
 
+use InvalidArgumentException;
+use RuntimeException;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
@@ -10,6 +12,9 @@ use Swoft\Console\Helper\Interact;
 use Swoft\Console\Input\Input;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Sys;
+use function alias;
+use function is_dir;
+use function output;
 
 /**
  * Some commands for application developing
@@ -41,17 +46,18 @@ class AssetCommand
      * @CommandOption("force", short="f", desc="Force override all exists file", default=false)
      *
      * @param Input $input
+     *
      * @return int
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function publish(Input $input): int
     {
-        $assetDir = $input->getArg(0);
+        $assetDir  = $input->getArg(0);
         $targetDir = $input->getArg(1);
 
         if (!$assetDir && !$targetDir) {
-            \output()->colored('arguments is required!', 'warning');
+            output()->colored('arguments is required!', 'warning');
 
             return -1;
         }
@@ -61,53 +67,53 @@ class AssetCommand
             $config = static::internalConfig();
 
             if (!isset($config[$assetDir])) {
-                \output()->colored('missing arguments!', 'warning');
+                output()->colored('missing arguments!', 'warning');
             }
 
             [$assetDir, $targetDir] = $config[$assetDir];
         }
 
-        $assetDir = \alias($assetDir);
-        $targetDir = \alias($targetDir);
+        $assetDir  = alias($assetDir);
+        $targetDir = alias($targetDir);
 
         $force = \input()->sameOpt(['f', 'force'], false);
 
-        if ($force && \is_dir($targetDir)) {
-            \output()->writeln("Will delete the old assets: $targetDir");
+        if ($force && is_dir($targetDir)) {
+            output()->writeln("Will delete the old assets: $targetDir");
 
             [$code, , $error] = Sys::run("rm -rf $targetDir");
 
             if ($code !== 0) {
-                \output()->colored("Delete dir $targetDir is failed!", 'error');
-                \output()->writeln($error);
+                output()->colored("Delete dir $targetDir is failed!", 'error');
+                output()->writeln($error);
 
                 return -2;
             }
         }
 
-        $yes = \input()->sameOpt(['y', 'yes'], false);
+        $yes     = \input()->sameOpt(['y', 'yes'], false);
         $command = "cp -Rf $assetDir $targetDir";
 
-        \output()->writeln("Will run shell command:\n $command");
+        output()->writeln("Will run shell command:\n $command");
 
         if (!$yes && !Interact::confirm('Ensure continue?')) {
-            \output()->writeln(' Quit, Bye!');
+            output()->writeln(' Quit, Bye!');
 
             return 0;
         }
 
         Dir::make($targetDir);
 
-        [$code, , $error] = Sys::run($command, \alias('@root'));
+        [$code, , $error] = Sys::run($command, alias('@root'));
 
         if ($code !== 0) {
-            \output()->colored("Publish assets to $targetDir is failed!", 'error');
-            \output()->writeln($error);
+            output()->colored("Publish assets to $targetDir is failed!", 'error');
+            output()->writeln($error);
 
             return -2;
         }
 
-        \output()->colored("\nPublish assets to $targetDir is OK!", 'success');
+        output()->colored("\nPublish assets to $targetDir is OK!", 'success');
 
         return 0;
     }

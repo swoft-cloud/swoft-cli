@@ -2,10 +2,28 @@
 
 namespace Swoft\Cli\Bean;
 
+use RuntimeException;
 use Swoft\Stdlib\Helper\Sys;
+use function array_merge;
+use function basename;
+use function file_get_contents;
+use function file_put_contents;
+use function fnmatch;
+use function glob;
+use function implode;
+use function in_array;
+use function is_dir;
+use function is_file;
+use function json_encode;
+use function md5;
+use function md5_file;
+use function preg_match;
+use function strpos;
+use function trim;
 
 /**
  * Class FilesWatcher - Check Dir's files modified by md5_file()
+ *
  * @since 2.0
  */
 final class ModifyWatcher
@@ -85,6 +103,7 @@ final class ModifyWatcher
 
     /**
      * ModifyWatcher constructor.
+     *
      * @param string|null $idFile
      */
     public function __construct(string $idFile = '')
@@ -94,6 +113,7 @@ final class ModifyWatcher
 
     /**
      * @param string $idFile
+     *
      * @return $this
      */
     public function setIdFile(string $idFile): self
@@ -104,36 +124,40 @@ final class ModifyWatcher
 
     /**
      * @param string|array $notNames
+     *
      * @return ModifyWatcher
      */
     public function name($notNames): self
     {
-        $this->notNames = \array_merge($this->notNames, (array)$notNames);
+        $this->notNames = array_merge($this->notNames, (array)$notNames);
         return $this;
     }
 
     /**
      * @param string|array $notNames
+     *
      * @return ModifyWatcher
      */
     public function notName($notNames): self
     {
-        $this->notNames = \array_merge($this->notNames, (array)$notNames);
+        $this->notNames = array_merge($this->notNames, (array)$notNames);
         return $this;
     }
 
     /**
      * @param string|array $excludeDirs
+     *
      * @return ModifyWatcher
      */
     public function exclude($excludeDirs): self
     {
-        $this->excludes = \array_merge($this->excludes, (array)$excludeDirs);
+        $this->excludes = array_merge($this->excludes, (array)$excludeDirs);
         return $this;
     }
 
     /**
      * @param bool $ignoreDotDirs
+     *
      * @return ModifyWatcher
      */
     public function ignoreDotDirs($ignoreDotDirs): ModifyWatcher
@@ -144,6 +168,7 @@ final class ModifyWatcher
 
     /**
      * @param bool $ignoreDotFiles
+     *
      * @return ModifyWatcher
      */
     public function ignoreDotFiles($ignoreDotFiles): ModifyWatcher
@@ -154,22 +179,25 @@ final class ModifyWatcher
 
     /**
      * @param string|array $dirs
+     *
      * @return $this
      */
     public function watch($dirs): self
     {
-        $this->watchDirs = \array_merge($this->watchDirs, (array)$dirs);
+        $this->watchDirs = array_merge($this->watchDirs, (array)$dirs);
         return $this;
     }
 
     /**
      * alias of the watch()
+     *
      * @param string|array $dirs
+     *
      * @return $this
      */
     public function watchDir($dirs): self
     {
-        $this->watchDirs = \array_merge($this->watchDirs, (array)$dirs);
+        $this->watchDirs = array_merge($this->watchDirs, (array)$dirs);
         return $this;
     }
 
@@ -185,7 +213,7 @@ final class ModifyWatcher
         $this->isChanged();
 
         // revert
-        $this->fastMode = $fastMode;
+        $this->fastMode    = $fastMode;
         $this->changedInfo = [];
     }
 
@@ -199,12 +227,12 @@ final class ModifyWatcher
 
     /**
      * @return bool
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function isChanged(): bool
     {
         if (!$this->idFile) {
-            $this->idFile = Sys::getTempDir() . '/' . \md5(\json_encode($this->watchDirs)) . '.id';
+            $this->idFile = Sys::getTempDir() . '/' . md5(json_encode($this->watchDirs)) . '.id';
         }
 
         // Get old hash id
@@ -226,21 +254,21 @@ final class ModifyWatcher
             return false;
         }
 
-        if (!\is_file($file)) {
+        if (!is_file($file)) {
             return false;
         }
 
-        return \trim(\file_get_contents($file));
+        return trim(file_get_contents($file));
     }
 
     /**
      * @return string
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function calcMd5Hash(): string
     {
         if (!$this->watchDirs) {
-            throw new \RuntimeException('Please setting want to watched directories before run.');
+            throw new RuntimeException('Please setting want to watched directories before run.');
         }
 
         // Reset data
@@ -255,10 +283,10 @@ final class ModifyWatcher
             $this->oldHash = $this->dirHash;
         }
 
-        $this->dirHash = \md5(\implode('', $this->md5Hashes));
+        $this->dirHash = md5(implode('', $this->md5Hashes));
 
         if ($this->idFile) {
-            \file_put_contents($this->idFile, $this->dirHash);
+            file_put_contents($this->idFile, $this->dirHash);
         }
 
         return $this->dirHash;
@@ -274,11 +302,11 @@ final class ModifyWatcher
         }
 
         // TODO replace `scandir` to `glob` or `SPLFile*`
-        foreach (\glob($watchDir . '/*') as $path) {
-            $name = \basename($path);
+        foreach (glob($watchDir . '/*') as $path) {
+            $name = basename($path);
 
             // Recursive directory
-            if (\is_dir($path)) {
+            if (is_dir($path)) {
                 if ($this->isWatchDir($name)) {
                     $this->collectDirMd5($path);
                 }
@@ -292,7 +320,7 @@ final class ModifyWatcher
             }
 
             $oldMd5  = '';
-            $fileMd5 = \md5_file($path);
+            $fileMd5 = md5_file($path);
 
             if (isset($this->md5Hashes[$path])) {
                 $oldMd5 = $this->md5Hashes[$path];
@@ -314,15 +342,16 @@ final class ModifyWatcher
 
     /**
      * @param string $dName
+     *
      * @return bool
      */
     public function isWatchDir(string $dName): bool
     {
-        if ($this->ignoreDotDirs && \strpos($dName, '.') === 0) {
+        if ($this->ignoreDotDirs && strpos($dName, '.') === 0) {
             return false;
         }
 
-        if (\in_array($dName, $this->excludes, true)) {
+        if (in_array($dName, $this->excludes, true)) {
             return false;
         }
 
@@ -331,18 +360,19 @@ final class ModifyWatcher
 
     /**
      * @param string $fName
+     *
      * @return bool
      */
     public function isWatchFile(string $fName): bool
     {
-        if ($this->ignoreDotFiles && \strpos($fName, '.') === 0) {
+        if ($this->ignoreDotFiles && strpos($fName, '.') === 0) {
             return false;
         }
 
         // Check exclude
         if ($this->notNames) {
             foreach ($this->notNames as $name) {
-                if (\preg_match('#' . $name . '#', $fName)) {
+                if (preg_match('#' . $name . '#', $fName)) {
                     return false;
                 }
             }
@@ -354,7 +384,7 @@ final class ModifyWatcher
         }
 
         foreach ($this->names as $name) {
-            if (\fnmatch($name, $fName)) {
+            if (fnmatch($name, $fName)) {
                 return true;
             }
         }
@@ -404,6 +434,7 @@ final class ModifyWatcher
 
     /**
      * @param bool $fastMode
+     *
      * @return ModifyWatcher
      */
     public function setFastMode(bool $fastMode): self

@@ -2,8 +2,13 @@
 
 namespace Swoft\Cli\Command;
 
+use InvalidArgumentException;
+use Leuffen\TextTemplate\TemplateParsingException;
+use ReflectionException;
+use RuntimeException;
+use Swoft;
+use Swoft\Bean\Exception\ContainerException;
 use Swoft\Cli\Bean\FileGenerator;
-use Swoft\Cli\Model\Logic\EntityLogic;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
@@ -11,6 +16,13 @@ use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Interact;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
+use function bean;
+use function dirname;
+use function file_exists;
+use function json_encode;
+use function ucfirst;
+use const JSON_PRETTY_PRINT;
+use const JSON_UNESCAPED_SLASHES;
 
 /**
  * Generate some common application template classes
@@ -31,7 +43,7 @@ class GenCommand
 
     public function init(): void
     {
-        $this->defaultTplPath = \dirname(__DIR__, 2) . '/res/templates/';
+        $this->defaultTplPath = dirname(__DIR__, 2) . '/res/templates/';
     }
 
     /**
@@ -44,14 +56,15 @@ class GenCommand
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="command.stub")
-     * @example <info>{fullCommand} demo</info>     Gen DemoCommand class to command dir
-     *
      * @param Input  $in
      * @param Output $out
+     *
      * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
+     * @example <info>{fullCommand} demo</info>     Gen DemoCommand class to command dir
+     *
      */
     public function command(Input $in, Output $out): int
     {
@@ -79,19 +92,19 @@ class GenCommand
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="command.stub")
      *
-     * @example
-     *   <info>{fullCommand} demo --prefix /demo -y</info>      Gen DemoController class to http controller dir
-     *   <info>{fullCommand} user --prefix /users --rest</info> Gen UserController class to http controller dir(RESTFul)
-     *
-     * @return int
-     *
      * @param Input  $in
      * @param Output $out
      *
      * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
+     *
+     * @return int
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
+     * @example
+     *   <info>{fullCommand} demo --prefix /demo -y</info>      Gen DemoController class to http controller dir
+     *   <info>{fullCommand} user --prefix /users --rest</info> Gen UserController class to http controller dir(RESTFul)
+     *
      */
     public function controller(Input $in, Output $out): int
     {
@@ -121,17 +134,18 @@ class GenCommand
      * @CommandOption("prefix", type="string", desc="The route prefix for the websocket, default is class name", default="string")
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="ws-module.stub")
+     * @param Input  $in
+     * @param Output $out
+     *
+     * @return int
+     * @return int
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
      * @example
      * <info>{fullCommand} echo --prefix /echo -y</info>   Gen EchoController class to WebSocket dir
      * <info>{fullCommand} chat --prefix /chat</info>      Gen ChatController class to WebSocket dir
      *
-     * @return int
-     * @param Input  $in
-     * @param Output $out
-     * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
      */
     public function websocket(Input $in, Output $out): int
     {
@@ -149,6 +163,7 @@ class GenCommand
     /**
      * Generate RPC service class
      * @CommandMapping(alias="rpc-ctrl")
+     *
      * @return int
      */
     public function rpcController(): int
@@ -166,14 +181,15 @@ class GenCommand
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Command")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="listener.stub")
-     * @example <info>{fullCommand} demo</info>     Gen DemoListener class to Listener dir
-     *
      * @param Input  $in
      * @param Output $out
+     *
      * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
+     * @example <info>{fullCommand} demo</info>     Gen DemoListener class to Listener dir
+     *
      */
     public function listener(Input $in, Output $out): int
     {
@@ -195,15 +211,16 @@ class GenCommand
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Middleware")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="middleware.stub")
+     * @param Input  $in
+     * @param Output $out
+     *
+     * @return int
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
      * @example
      * <info>{fullCommand} demo</info>     Gen DemoMiddleware class to Middleware dir
      *
-     * @param Input  $in
-     * @param Output $out
-     * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
      */
     public function middleware(Input $in, Output $out): int
     {
@@ -225,15 +242,16 @@ class GenCommand
      *
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Task")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="task.stub")
+     * @param Input  $in
+     * @param Output $out
+     *
+     * @return int
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
      * @example
      * <info>{fullCommand} demo</info>     Gen DemoTask class to Task dir
      *
-     * @param Input  $in
-     * @param Output $out
-     * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
      */
     public function task(Input $in, Output $out): int
     {
@@ -257,15 +275,16 @@ class GenCommand
      * @CommandOption("suffix", type="string", desc="The class name suffix", default="Process")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="process.stub")
      *
+     * @param Input  $in
+     * @param Output $out
+     *
+     * @return int
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws TemplateParsingException
      * @example
      * <info>{fullCommand} demo</info>     Gen DemoProcess class to Process dir
      *
-     * @param Input  $in
-     * @param Output $out
-     * @return int
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
      */
     public function process(Input $in, Output $out): int
     {
@@ -291,13 +310,13 @@ class GenCommand
      * @CommandOption("field-prefix", desc="Specify the field prefix that needs to be removed", type="string")
      * @CommandOption("tpl-file", type="string", desc="The template file dir path", default="entity.stub")
      *
-     * @example
-     * <info>{fullCommand} -d test</info>     Gen DemoProcess class to Model/Entity
      * @param Input  $in
      * @param Output $out
      *
-     * @throws \ReflectionException
-     * @throws \Swoft\Bean\Exception\ContainerException
+     * @throws ReflectionException
+     * @throws ContainerException
+     * @example
+     * <info>{fullCommand} -d test</info>     Gen DemoProcess class to Model/Entity
      */
     public function entity(Input $in, Output $out): void
     {
@@ -314,7 +333,7 @@ class GenCommand
         ];
 
         /* @var EntityLogic $logic */
-        $logic = \bean(EntityLogic::class);
+        $logic = bean(EntityLogic::class);
         $logic->generate($params);
     }
 
@@ -322,6 +341,7 @@ class GenCommand
      * @param Input  $in
      * @param Output $out
      * @param array  $defaults
+     *
      * @return array
      */
     private function collectInfo(Input $in, Output $out, array $defaults = []): array
@@ -336,7 +356,7 @@ class GenCommand
         }
 
         if (!$name) {
-            $out->writeln('<error>No class name input! Quit</error>', true, 1);
+            $out->writeln('<error>No class name input! Quit</error>', true);
         }
 
         $sfx  = $in->getOpt('suffix') ?: $defaults['suffix'];
@@ -344,7 +364,7 @@ class GenCommand
             'name'      => $name,
             'suffix'    => $sfx,
             'namespace' => $in->sameOpt(['n', 'namespace']) ?: $defaults['namespace'],
-            'className' => \ucfirst($name) . $sfx,
+            'className' => ucfirst($name) . $sfx,
         ];
 
         return [$config, $data];
@@ -355,25 +375,26 @@ class GenCommand
      * @param array  $data
      * @param array  $config
      * @param Output $out
+     *
      * @return int
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws \Leuffen\TextTemplate\TemplateParsingException
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
+     * @throws TemplateParsingException
      */
     private function writeFile(string $defaultDir, array $data, array $config, Output $out): int
     {
         // $out->writeln("Some Info: \n" . \json_encode($config, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
-        $out->writeln("Class data: \n" . \json_encode($data, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+        $out->writeln("Class data: \n" . json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
         if (!$saveDir = \input()->getArg(1)) {
             $saveDir = $defaultDir;
         }
 
-        $file = \Swoft::getAlias($saveDir) . '/' . $data['className'] . '.php';
+        $file = Swoft::getAlias($saveDir) . '/' . $data['className'] . '.php';
 
         $out->writeln("Target File: <info>$file</info>\n");
 
-        if (\file_exists($file)) {
+        if (file_exists($file)) {
             $override = \input()->sameOpt(['o', 'override']);
 
             if (null === $override) {
