@@ -22,5 +22,5 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    repo: composer/composer
+    repo: swoft-cloud/swoft-cli
     php:  '7.2'
