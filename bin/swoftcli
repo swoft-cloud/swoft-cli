@@ -1,8 +1,14 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
+use Swoft\Cli\SwoftCLI;
+
 // Bootstrap
 require_once __DIR__ . '/bootstrap.php';
 
+$config = [
+  // 'basePath' => dirname(__DIR__),
+];
+
 // Run application
-(new \Swoft\Cli\SwoftCLI())->run();
+(new SwoftCLI($config))->run();
