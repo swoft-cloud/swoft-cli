@@ -1,0 +1,26 @@
+language: php
+
+php:
+  - 7.1
+  - 7.2
+  - 7.3
+
+before_script:
+  - composer config -g process-timeout 900 && composer update
+  - phpenv config-rm xdebug.ini
+
+script:
+  - composer test
+
+before_deploy:
+  - php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar
+
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  file: swoftcli.phar
+  skip_cleanup: true
+  on:
+    tags: true
+    repo: swoft-cloud/swoft-cli
+    php:  '7.2'
