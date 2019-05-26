@@ -11,7 +11,7 @@
 ## Install
 
 ```bash
-wget swoftcli.phar
+wget https://github.com/swoft-cloud/swoft-cli/releases/swoftcli.phar
 ```
 
 Move to ENV path:
@@ -20,26 +20,10 @@ Move to ENV path:
 mv swoftcli.phar /usr/local/bin
 ```
 
-## Composer
+## Build
 
-```text
-    "swoft/devtool": "2.0.x-dev",
-    "swoft/view": "2.0.x-dev as 2.0",
-
-https://packagist.phpcomposer.com
-
-https://packagist.laravel-china.org
-
-    "0": {
-      "type": "git",
-      "url": "https://github.com/ulue/swoft-component.git"
-    },
-    
-    
-    "0": {
-          "type": "path",
-          "url": "/Users/inhere/Workspace/php/swoft/swoftv2/swoft-component"
-        }
+```bash
+php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar
 ```
 
 ## License

@@ -16,8 +16,7 @@
     "ext-mbstring": "*",
     "text/template": "~2.3",
     "seld/phar-utils": "^1.0",
-    "swoft/framework": "~2.0.0",
-    "swoft/http-server": "~2.0.0"
+    "swoft/framework": "~2.0.0"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master"
@@ -36,10 +35,13 @@
     "packagist": {
       "type": "composer",
       "url": "https://packagist.laravel-china.org"
+    },
+    "0": {
+      "type": "path",
+      "url": "/Users/inhere/Workspace/php/swoft/swoftv2/swoft-component"
     }
   },
   "scripts": {
-    "test0": "echo 'hello'",
     "test": "./vendor/bin/phpunit -c phpunit.xml",
     "cs-fix": "./vendor/bin/php-cs-fixer fix $1"
   }

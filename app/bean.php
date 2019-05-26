@@ -15,15 +15,14 @@ return [
             'log_file' => alias('@runtime/swoole.log'),
         ],
     ],
-    'wsServer'   => [
-        'on'      => [
-            // Enable http handle
-            SwooleEvent::REQUEST => bean(RequestListener::class),
-        ],
-        'debug' => env('SWOFT_DEBUG', 1),
-        /** @see \Swoft\WebSocket\Server\WebSocketServer::$setting */
-        'setting' => [
-            'log_file' => alias('@runtime/swoole.log'),
-        ],
-    ],
+    // 'wsServer'   => [
+    //     'on'      => [
+    //         // Enable http handle
+    //         SwooleEvent::REQUEST => bean(RequestListener::class),
+    //     ],
+    //     'debug' => env('SWOFT_DEBUG', 1),
+    //     'setting' => [
+    //         'log_file' => alias('@runtime/swoole.log'),
+    //     ],
+    // ],
 ];

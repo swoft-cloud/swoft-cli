@@ -10,7 +10,7 @@ before_script:
   - phpenv config-rm xdebug.ini
 
 script:
-  - composer test
+  - composer test0
 
 before_deploy:
   - php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar
