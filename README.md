@@ -10,11 +10,25 @@
 
 ## Install
 
+Download phar from github releases page
+
+> Notice: please replace the `VERSION` to specified version
+
 ```bash
-wget https://github.com/swoft-cloud/swoft-cli/releases/download/{VERSION}/swoftcli.phar
-# Move to ENV path:
+wget https://github.com/swoft-cloud/swoft-cli/releases/download/VERSION/swoftcli.phar
+
+# quick check
+php swoftcli.phar -V
+php swoftcli.phar -h
+```
+
+Add to global ENV PATH:
+
+```bash
+# move to ENV path:
 mv swoftcli.phar /user/local/bin/swoftcli
 chmod a+x /user/local/bin/swoftcli
+
 # check
 swoftcli -V
 ```
