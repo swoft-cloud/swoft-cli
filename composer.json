@@ -16,8 +16,8 @@
     "ext-mbstring": "*",
     "text/template": "~2.3",
     "seld/phar-utils": "^1.0",
-    "swoft/framework": "~2.0.0",
-    "swoft/http-server": "~2.0.0"
+    "swoft/framework": "~2.0.1",
+    "swoft/http-server": "~2.0.1"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master"
