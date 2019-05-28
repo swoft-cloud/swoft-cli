@@ -11,16 +11,17 @@
 ## Install
 
 ```bash
-wget https://github.com/swoft-cloud/swoft-cli/releases/swoftcli.phar
-```
-
-Move to ENV path:
-
-```bash
-mv swoftcli.phar /usr/local/bin
+wget https://github.com/swoft-cloud/swoft-cli/releases/download/{VERSION}/swoftcli.phar
+# Move to ENV path:
+mv swoftcli.phar /user/local/bin/swoftcli
+chmod a+x /user/local/bin/swoftcli
+# check
+swoftcli -V
 ```
 
 ## Build
+
+You can build package from latest code:
 
 ```bash
 php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar
