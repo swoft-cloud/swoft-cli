@@ -6,7 +6,7 @@ use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 
 /**
- * Class ClientCommand
+ * Class ClientCommand[<mga>WIP</mga>]
  *
  * @Command()
  */

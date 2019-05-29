@@ -2,6 +2,8 @@
 
 namespace Swoft\Cli\Command;
 
+use Swoft\Console\Helper\Show;
+
 class ToolCommand
 {
     /**
@@ -9,6 +11,6 @@ class ToolCommand
      */
     public function ab(): void
     {
-
+        Show::info('WIP');
     }
 }

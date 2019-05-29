@@ -12,7 +12,7 @@ return [
     'httpServer' => [
         /** @see \Swoft\Http\Server\HttpServer::$setting */
         'setting' => [
-            'log_file' => alias('@runtime/swoole.log'),
+            'log_file' => alias('@runtime/swoole-for-scli.log'),
         ],
     ],
     // 'wsServer'   => [

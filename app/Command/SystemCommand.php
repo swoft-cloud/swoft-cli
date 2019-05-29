@@ -12,7 +12,7 @@ use const PHP_VERSION;
 use const SWOOLE_VERSION;
 
 /**
- * Provide some system information commands
+ * Provide some system information commands[<mga>WIP</mga>]
  * - CPU
  * - MEMORY
  * - DISK
@@ -42,12 +42,12 @@ class SystemCommand
 
     public function top(): void
     {
-
+        Show::info('WIP');
     }
 
     public function uptime(): void
     {
-
+        Show::info('WIP');
     }
 
     /*****************************************************************************
@@ -56,7 +56,7 @@ class SystemCommand
 
     public function vmstat(): void
     {
-
+        Show::info('WIP');
     }
 
     /**
@@ -64,17 +64,17 @@ class SystemCommand
      */
     public function htop(): void
     {
-
+        Show::info('WIP');
     }
 
     public function nmon(): void
     {
-
+        Show::info('WIP');
     }
 
     public function mpstat(): void
     {
-
+        Show::info('WIP');
     }
 
     /*****************************************************************************
@@ -83,12 +83,12 @@ class SystemCommand
 
     public function ps(): void
     {
-
+        Show::info('WIP');
     }
 
     public function free(): void
     {
-
+        Show::info('WIP');
     }
 
     /*****************************************************************************
@@ -102,22 +102,22 @@ class SystemCommand
 
     public function lsof(): void
     {
-
+        Show::info('WIP');
     }
 
     public function iftop(): void
     {
-
+        Show::info('WIP');
     }
 
     public function iptraf(): void
     {
-
+        Show::info('WIP');
     }
 
     public function netstat(): void
     {
-
+        Show::info('WIP');
     }
 
     /**
@@ -125,7 +125,7 @@ class SystemCommand
      */
     public function ioTop(): void
     {
-
+        Show::info('WIP');
     }
 
     /**
@@ -133,15 +133,15 @@ class SystemCommand
      */
     public function ioStat(): void
     {
-
+        Show::info('WIP');
     }
 
     /**
-     * @CommandMapping(alias="ioprofile")
+     * @CommandMapping(alias="ioprofile,iopro")
      */
     public function ioProfile(): void
     {
-
+        Show::info('WIP');
     }
 
     /*****************************************************************************
@@ -150,6 +150,6 @@ class SystemCommand
 
     public function df(): void
     {
-
+        Show::info('WIP');
     }
 }

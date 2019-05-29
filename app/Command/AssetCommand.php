@@ -17,7 +17,7 @@ use function is_dir;
 use function output;
 
 /**
- * Some commands for application developing
+ * provide some commands for application developing[<mga>WIP</mga>]
  * @Command()
  */
 class AssetCommand

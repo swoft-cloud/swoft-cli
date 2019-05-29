@@ -20,7 +20,9 @@ class SwoftCLI extends SwoftApplication
         $this->setRuntimePath(Sys::getTempDir());
 
         // fix: on php73 preg_* error
-        ini_set('pcre.jit', 'off');
+        if (\PHP_VERSION_ID > 70300) {
+            ini_set('pcre.jit', 'off');
+        }
 
         Swoft::setAlias('@swoftcli', dirname(__DIR__));
     }
@@ -28,9 +30,9 @@ class SwoftCLI extends SwoftApplication
     public function getCLoggerConfig(): array
     {
         $config = parent::getCLoggerConfig();
-        // disable
+        // disable print console start log
         $config['enable'] = false;
-        // \var_dump($config);die;
+
         return $config;
     }
 }

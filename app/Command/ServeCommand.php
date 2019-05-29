@@ -32,7 +32,7 @@ use function time;
  *
  * @Command(idAliases={"run": "serve:run"}, coroutine=false)
  * @CommandOption("debug", default=false, desc="open debug mode for display more detail", type="bool")
- * @CommandOption("php-bin", default="/usr/local/bin/php", desc="Custom the php bin file path", type="string")
+ * @CommandOption("php-bin", default="php", desc="Custom the php bin file path", type="string")
  */
 class ServeCommand
 {
