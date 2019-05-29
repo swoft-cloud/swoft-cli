@@ -31,7 +31,6 @@ use function time;
  * @since 2.0
  *
  * @Command(idAliases={"run": "serve:run"}, coroutine=false)
- * @CommandOption("debug", default=false, desc="open debug mode for display more detail", type="bool")
  * @CommandOption("php-bin", default="php", desc="Custom the php bin file path", type="string")
  */
 class ServeCommand

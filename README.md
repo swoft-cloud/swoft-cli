@@ -8,6 +8,8 @@
 - Generate swoft class: http controller, ws controller, model and more class
 - More features ...
 
+> Documents on https://www.swoft.org/docs/2.x/zh-CN/tool/swoftcli/index.html
+
 ## Install
 
 Download phar from github releases page
