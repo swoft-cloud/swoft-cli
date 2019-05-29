@@ -10,6 +10,7 @@ use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
+use Swoft\Stdlib\Helper\Sys;
 use Swoole\Process;
 use function array_map;
 use function date;
@@ -87,6 +88,14 @@ class ServeCommand
         $this->debug  = $input->getBoolOpt('debug');
         $this->phpBin = $input->getOpt('php-bin');
 
+        if ($this->phpBin === 'php') {
+            [$ok, $ret, ] = Sys::run('which php');
+
+            if ($ok === 0) {
+                $this->phpBin = \trim($ret);
+            }
+        }
+
         $interval = (int)$input->getOpt('interval', 3);
         if ($interval < 0 || $interval > 15) {
             $interval = 3;
@@ -111,9 +120,10 @@ class ServeCommand
         // $cmd = "php {$pwd}/bin/swoftcli sys:info";
         $this->entryFile = $this->targetPath . '/' . $this->binFile;
 
-        output()->aList([
+        Show::aList([
             'current pid' => getmypid(),
             'current dir' => $workDir,
+            'php binFile' => $this->phpBin,
             'target path' => $this->targetPath,
             'watch dirs'  => $this->watchDir,
             'entry file'  => $this->entryFile,
