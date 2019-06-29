@@ -17,7 +17,8 @@
     "text/template": "~2.3",
     "seld/phar-utils": "^1.0",
     "swoft/framework": "~2.0.1",
-    "swoft/http-server": "~2.0.1"
+    "swoft/http-server": "~2.0.1",
+    "swoft-project/basic-template": "dev-master as 1.0"
   },
   "require-dev": {
     "swoft/swoole-ide-helper": "dev-master"
@@ -36,6 +37,10 @@
     "packagist": {
       "type": "composer",
       "url": "https://packagist.laravel-china.org"
+    },
+    "0": {
+      "type": "git",
+      "url": "https://github.com/swoft-project/basic-template.git"
     }
   },
   "scripts": {

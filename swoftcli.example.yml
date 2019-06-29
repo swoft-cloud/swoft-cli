@@ -1,0 +1,8 @@
+arguments:
+  a: 1
+options:
+  b: 2
+commands:
+  "gen:controller":
+    - a
+    - b
