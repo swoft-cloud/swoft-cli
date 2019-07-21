@@ -8,11 +8,12 @@ return [
         'idAliases' => [
             // 'run' => 'serve:run'
         ],
+        'disabledGroups' => ['http', 'asset'],
     ],
     'httpServer' => [
         /** @see \Swoft\Http\Server\HttpServer::$setting */
         'setting' => [
-            'log_file' => alias('@runtime/swoole-for-scli.log'),
+            'log_file' => alias('@runtime/swoftcli.log'),
         ],
     ],
     // 'wsServer'   => [

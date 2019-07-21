@@ -11,7 +11,10 @@ use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
+use Swoft\Console\Input\Input;
+use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Dir;
+use Swoft\Stdlib\Helper\Str;
 use function filesize;
 use function input;
 use function is_file;
@@ -35,9 +38,13 @@ class PharCommand
      *     desc="Setting the project directory for packing, default is current work-dir"
      * )
      * @CommandOption("fast", desc="Fast build. only add modified files by <cyan>git status -s</cyan>")
-     * @CommandOption("refresh", desc="Whether build vendor folder files on phar file exists", default=false)
+     * @CommandOption("refresh", default=false, type="bool", desc="Whether build vendor folder files on phar file exists")
      * @CommandOption("output", short="o", desc="Setting the output file name", type="string", default="app.phar")
-     * @CommandOption("config", short="c", type="string", desc="Use the defined config for build phar")
+     * @CommandOption("config", short="c", type="string", desc="Use the defined config file for build phar")
+     * @CommandOption("files", type="string", desc="only pack the list files to the exist phar, multi use ',' split")
+     * @param Input  $input
+     * @param Output $output
+     *
      * @return int
      * @throws Exception
      * @example
@@ -46,14 +53,15 @@ class PharCommand
      *
      *   php -d phar.readonly=0 {binFile} phar:pack -o=scli.phar
      */
-    public function pack(): int
+    public function pack(Input $input, Output $output): int
     {
         $startAt  = microtime(true);
-        $workDir  = input()->getPwd();
-        $outFile  = input()->sameOpt(['o', 'output']) ?: 'app.phar';
+        $workDir  = $input->getPwd();
+        $outFile  = $input->sameOpt(['o', 'output']) ?: 'app.phar';
         $pharFile = $workDir . '/' . $outFile;
 
-        $dir = input()->getOpt('dir') ?: $workDir;
+        $dir = $input->getOpt('dir') ?: $workDir;
+        $cpr = $this->configCompiler($dir);
 
         Show::aList([
             'work dir'  => $workDir,
@@ -61,24 +69,25 @@ class PharCommand
             'phar file' => $pharFile,
         ], 'Building Information');
 
-        $cpr = $this->configCompiler($dir);
-
-        // $counter = 0;
-        $refresh = input()->getOpt('refresh');
-
         // use fast build
-        if (input()->getOpt('fast')) {
+        if ($input->getBoolOpt('fast')) {
             $cpr->setModifies($cpr->findChangedByGit());
-
-            output()->liteInfo('Use fast build, will only pack changed or new files(by git status)');
+            $output->liteInfo('Use fast build, will only pack changed or new files(by git status)');
         }
 
-        output()->info('Pack file to Phar ... ...');
+        // musual append some files
+        if ($files = $input->getStringOpt('files')) {
+            $cpr->addFile(Str::explode($files, ','));
+            $output->liteInfo("will only pack input files to the exists phar: $outFile");
+        }
+
         $cpr->onError(function ($error) {
             output()->writeln("<warning>$error</warning>");
         });
 
-        if (input()->getOpt('debug')) {
+        $counter = null;
+        if ($input->getOpt('debug')) {
+            $output->info('Pack file to Phar ... ...');
             $cpr->onAdd(function ($path) {
                 output()->writeln(" <info>+</info> $path");
             });
@@ -86,10 +95,22 @@ class PharCommand
             $cpr->on('skip', function (string $path, bool $isFile) {
                 output()->writeln(" <red>-</red> $path" . ($isFile ? '[F]' : '[D]'));
             });
+        } else {
+            $output->info('Pack file to Phar:');
+            $counter = Show::counterTxt('<info>Packing ...</info>', 'Done.');
+            $cpr->onAdd(function () use ($counter) {
+                $counter->send(1);
+            });
         }
 
         // packing ...
+        $refresh = $input->getBoolOpt('refresh');
         $cpr->pack($pharFile, $refresh);
+
+        // end
+        if ($counter) {
+            $counter->send(-1);
+        }
 
         $info = [
             PHP_EOL . '<success>Phar Build Completed!</success>',
@@ -99,7 +120,7 @@ class PharCommand
             ' - Pack File: ' . $cpr->getCounter(),
             ' - Commit ID: ' . $cpr->getLastCommit(),
         ];
-        output()->writeln($info);
+        $output->writeln($info);
 
         return 0;
     }
