@@ -4,6 +4,7 @@ namespace Swoft\Cli\Command;
 
 use Swoft;
 use Swoft\Cli\Bean\ModifyWatcher;
+use Swoft\Cli\Helper\CliHelper;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
@@ -128,7 +129,7 @@ class ServeCommand
             'watch dirs'  => $this->watchDir,
             'entry file'  => $this->entryFile,
             'execute cmd' => sprintf('%s %s/%s %s', $this->phpBin, $this->targetPath, $this->binFile, $this->startCmd),
-        ], 'Some information');
+        ], 'Work information');
 
         if (!file_exists($this->entryFile)) {
             Show::liteError('The swoft entry file is not exist');
@@ -181,7 +182,7 @@ class ServeCommand
         $mw->watchDir($watchDirs);
         $mw->initHash();
 
-        Show::aList($mw->getWatchDir(), 'watched directories');
+        Show::aList($mw->getWatchDir(), 'Watched Directories');
 
         $pid = $this->startServer();
 
@@ -189,11 +190,11 @@ class ServeCommand
             if ($ret = Process::wait(false)) {
                 $exitPid  = $ret['pid'];
                 $exitCode = $ret['code'];
-                Show::warning("Server [$exitPid] exited (signal {$ret['signal']}, code $exitCode)");
+                CliHelper::warn("Server(pid $exitPid) exited (signal {$ret['signal']}, code $exitCode)");
 
                 // Exit with error
                 if ($exitCode !== 0) {
-                    Show::error('Server error exit');
+                    CliHelper::error('Server error exit');
                     return;
                 }
 
@@ -203,18 +204,18 @@ class ServeCommand
             }
 
             if ($mw->isChanged()) {
-                Show::info(date('Y/m/d H:i:s') . ': file changed!');
+                CliHelper::info(date('Y/m/d H:i:s') . ': file changed!');
                 Show::aList($mw->getChangedInfo(), 'modify info');
-                Show::info('will restart server');
+                CliHelper::info('will restart server');
 
                 if (false === $this->stopServer($pid)) {
-                    Show::writeln('Exit');
+                    CliHelper::info('Exit');
                     break;
                 }
 
                 $pid = $this->startServer();
             } elseif ($this->debug) {
-                Show::info(date('Y/m/d H:i:s') . ': no change!');
+                CliHelper::info(date('Y/m/d H:i:s') . ': no change!');
             }
 
             sleep($this->interval);
@@ -223,7 +224,7 @@ class ServeCommand
 
     private function startServer(): int
     {
-        Show::info('Start swoft server');
+        CliHelper::info('Start swoft server');
 
         // Create process
         $p = new Process(function (Process $p) {
@@ -235,12 +236,12 @@ class ServeCommand
 
     public function stopServer(int $pid): bool
     {
-        Show::info('Stop old server. PID ' . $pid);
+        CliHelper::info('Stop old server. PID ' . $pid);
 
         $ok = false;
         // SIGTERM = 15
         $signal    = 15;
-        $timeout   = 5;
+        $timeout   = 30;
         $startTime = time();
 
         // retry stop if not stopped.
@@ -258,7 +259,7 @@ class ServeCommand
             // Has been timeout
             if ((time() - $startTime) >= $timeout) {
                 $ok = false;
-                Show::error('Stop sever is failed');
+                CliHelper::error('Stop sever is failed');
                 break;
             }
 
