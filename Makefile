@@ -12,7 +12,7 @@ help:
 
 ##Available Commands:
 
-  phar:		## Pack project codes to a phar package
+  phar:		## Pack the project codes to swoftcli.phar package
 phar:
 	php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar
 

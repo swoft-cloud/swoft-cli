@@ -77,7 +77,7 @@ class PharCommand
 
         // musual append some files
         if ($files = $input->getStringOpt('files')) {
-            $cpr->addFile(Str::explode($files, ','));
+            $cpr->setModifies(Str::explode($files, ','));
             $output->liteInfo("will only pack input files to the exists phar: $outFile");
         }
 

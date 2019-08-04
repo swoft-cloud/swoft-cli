@@ -12,3 +12,4 @@ temp/
 .phpintel/
 .env
 .DS_Store
+swoftcli.yml

@@ -10,7 +10,7 @@
 $compiler
     ->stripComments(true)
     ->setShebang(true)
-    ->addSuffix(['.tpl', '.json'])
+    ->addSuffix(['.tpl', '.json', '.stub'])
     ->addExcludeDir([
         'test',
         'doc',

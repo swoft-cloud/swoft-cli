@@ -6,6 +6,8 @@ use Swoft;
 use Swoft\Stdlib\Helper\Sys;
 use Swoft\SwoftApplication;
 use function dirname;
+use function file_exists;
+use function getcwd;
 use function ini_set;
 
 /**
