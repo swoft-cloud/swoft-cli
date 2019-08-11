@@ -5,6 +5,7 @@ namespace Swoft\Cli\Command;
 use Swoft;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
+use Swoft\Console\Input\Input;
 use Swoft\Console\Helper\Show;
 use const BASE_PATH;
 use const PHP_OS;
