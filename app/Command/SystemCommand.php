@@ -23,18 +23,20 @@ class SystemCommand
 {
     /**
      * @CommandMapping()
+     * @param Input  $in
      */
-    public function info(): void
+    public function info(Input $in): void
     {
         $info = [
             // "<bold>System environment info</bold>\n",
             'OS'             => PHP_OS,
+            'CPU number'     => \swoole_cpu_num(),
             'Php version'    => PHP_VERSION,
             'Swoole version' => SWOOLE_VERSION,
             'Swoft version'  => Swoft::VERSION,
             // 'App Name'       => \APP_NAME,
-            'Base Path'      => BASE_PATH,
-            // 'CPU number'      => \swoole_cpu_num(),
+            'Base Dir'       => BASE_PATH,
+            'Work Dir'       => $in->getWorkDir(),
         ];
 
         Show::aList($info, 'System Environment');

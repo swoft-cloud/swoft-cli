@@ -3,17 +3,21 @@
 namespace Swoft\Cli\Command;
 
 use Swoft\Console\Annotation\Mapping\Command;
+use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
+use Swoft\Console\Helper\Interact;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
 use Swoft\Tcp\Protocol;
 use Swoole\Coroutine\Client;
+use Swoole\Coroutine\Http\Client as HttpCoClient;
+use function json_decode;
 use const SWOOLE_SOCK_TCP;
 
 /**
- * Class ClientCommand[<mga>WIP</mga>]
+ * Privide some commads for quick connect tcp, ws server
  *
  * @Command()
  */
@@ -26,6 +30,7 @@ class ClientCommand
      * @CommandOption("host", short="H", desc="the tcp server host address", default="127.0.0.1", type="string")
      * @CommandOption("port", short="p", desc="the tcp server port number", default="18309", type="integer")
      * @CommandOption("split", short="s", desc="the tcp package split type: eof, len", default="eof", type="string")
+     * @CommandOption("packer", desc="the tcp package data packer: token-text, json, php", default="token-text", type="string")
      *
      * @param Input  $input
      * @param Output $output
@@ -36,6 +41,15 @@ class ClientCommand
         $sType = $input->getSameOpt(['split', 's'], 'eof');
         if ($sType === 'len') {
             $proto->setOpenLengthCheck(true);
+        }
+
+        if ($pType = $input->getStringOpt('packer')) {
+            if (!$proto->isValidType($pType)) {
+                $output->error("input invalid packer type: {$pType}, allow: token-text, json, php");
+                return;
+            }
+
+            $proto->setType($pType);
         }
 
         $output->aList([
@@ -53,7 +67,7 @@ class ClientCommand
 
         CONNCET:
         $output->colored('Begin connecting to tcp server: ' . $addr);
-        if (!$ok = $client->connect((string)$host, (int)$port, 5.0)) {
+        if (!$client->connect((string)$host, (int)$port, 5.0)) {
             $code = $client->errCode;
             /** @noinspection PhpComposerExtensionStubsInspection */
             $msg = socket_strerror($code);
@@ -81,7 +95,7 @@ class ClientCommand
                 /** @noinspection PhpComposerExtensionStubsInspection */
                 $output->error('Send error - ' . socket_strerror($client->errCode));
 
-                if ($this->quickConfirm($input, 'Reconnect', true)) {
+                if (Interact::confirm('Reconnect', true, false)) {
                     $client->close();
                     goto CONNCET;
                 }
@@ -100,7 +114,7 @@ class ClientCommand
 
             if ($res === '') {
                 $output->info('Server closed connection');
-                if ($this->quickConfirm($input, 'Reconnect', true)) {
+                if (Interact::confirm('Reconnect', true, false)) {
                     $client->close();
                     goto CONNCET;
                 }
@@ -110,7 +124,7 @@ class ClientCommand
             }
 
             [$head, $body] = $proto->unpackData($res);
-            $output->prettyJSON($head);
+            $output->writeln('head: ' . json_encode($head));
             $output->writef('<yellow>server</yellow>> %s', $body);
         }
 
@@ -118,30 +132,94 @@ class ClientCommand
     }
 
     /**
+     * connect to websocket server and allow send message interactive
      * @CommandMapping("ws")
-     */
-    public function websocket(): void
-    {
-
-    }
-
-    /**
-     * @param Input  $input
-     * @param string $msg
-     * @param bool   $default
+     * @CommandOption("host", short="H", desc="the tcp server host address", default="127.0.0.1", type="string")
+     * @CommandOption("port", short="p", desc="the tcp server port number", default="18308", type="integer")
+     * @CommandArgument("path", type="string", default="/echo", desc="the want connected websocket server uri path")
+     * @example
+     *  {fullCmd} /chat
      *
-     * @return bool
+     * @param Input  $input
+     * @param Output $output
      */
-    private function quickConfirm(Input $input, string $msg, bool $default = false): bool
+    public function websocket(Input $input, Output $output): void
     {
-        $def = $default ? 'y' : 'n';
-        $yes = $input->read("{$msg}? y/n[$def]: ");
+        $path = $input->getString('path');
+        $host = $input->getSameOpt(['host', 'H'], '127.0.0.1');
+        $port = $input->getSameOpt(['port', 'p'], 18308);
+        $addr = $host . ':' . $port;
 
-        if ('' === $yes) {
-            $yes = $def;
+        $output->colored("Begin connecting to websocket server: $addr path: $path");
+
+        $client = new HttpCoClient((string)$host, (int)$port, false);
+
+        CONNCET:
+        if (!$client->upgrade($input->getString('path'))) {
+            $code = $client->errCode;
+            /** @noinspection PhpComposerExtensionStubsInspection */
+            $msg = socket_strerror($code);
+            Show::error("websocket handshake failed. Error($code): $msg");
+            return;
         }
 
-        return stripos($yes, 'y') === 0;
+        $output->colored('Success connect to websocket server. Now, you can send message');
+        $output->title('INTERACTIVE', ['indent' => 0]);
+
+        if ($res = $client->recv(1.0)) {
+            $output->writef('<yellow>server</yellow>> %s', $res);
+        }
+
+        while (true) {
+            if (!$msg = $output->read('<info>client</info>> ')) {
+                $output->liteWarning('Please input message for send');
+                continue;
+            }
+
+            // Exit interactive terminal
+            if ($msg === 'quit' || $msg === 'exit') {
+                $output->colored('Quit, Bye!');
+                break;
+            }
+
+            // Send message
+            if (false === $client->push($msg)) {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                $output->error('Send error - ' . socket_strerror($client->errCode));
+
+                if (Interact::confirm('Reconnect', true, false)) {
+                    $client->close();
+                    goto CONNCET;
+                }
+
+                $output->colored('GoodBye!');
+                break;
+            }
+
+            // Recv response
+            $res = $client->recv(2.0);
+            if ($res === false) {
+                /** @noinspection PhpComposerExtensionStubsInspection */
+                $output->error('Recv error - ' . socket_strerror($client->errCode));
+                continue;
+            }
+
+            if ($res === '') {
+                $output->info('Server closed connection');
+                if (Interact::confirm('Reconnect', true, false)) {
+                    $client->close();
+                    goto CONNCET;
+                }
+
+                $output->colored('GoodBye!');
+                break;
+            }
+
+            // $output->prettyJSON($head);
+            $output->writef('<yellow>server</yellow>> %s', $res);
+        }
+
+        $client->close();
     }
 
     /**

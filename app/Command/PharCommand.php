@@ -51,7 +51,11 @@ class PharCommand
      *   {fullCommand}                               Pack current dir to a phar file.
      *   {fullCommand} --dir vendor/swoft/devtool    Pack the specified dir to a phar file.
      *
+     *  custom output phar file name
      *   php -d phar.readonly=0 {binFile} phar:pack -o=scli.phar
+     *
+     *  only update the input files:
+     *   php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --debug --files app/Command/ServeCommand.php
      */
     public function pack(Input $input, Output $output): int
     {
@@ -97,7 +101,7 @@ class PharCommand
             });
         } else {
             $output->info('Pack file to Phar:');
-            $counter = Show::counterTxt('<info>Packing ...</info>', 'Done.');
+            $counter = Show::counterTxt('<info>File Packing ...</info>', 'Done.');
             $cpr->onAdd(function () use ($counter) {
                 $counter->send(1);
             });

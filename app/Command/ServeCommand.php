@@ -11,8 +11,10 @@ use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
+use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Sys;
 use Swoole\Process;
+use function array_filter;
 use function array_map;
 use function date;
 use function explode;
@@ -26,6 +28,7 @@ use function sprintf;
 use function str_replace;
 use function strpos;
 use function time;
+use function trim;
 
 /**
  * Provide some commands for manage and watch swoft server project
@@ -37,6 +40,11 @@ use function time;
  */
 class ServeCommand
 {
+    /**
+     * @var int
+     */
+    private $pid = 0;
+
     /**
      * @var bool
      */
@@ -132,7 +140,23 @@ class ServeCommand
         ], 'Work information');
 
         if (!file_exists($this->entryFile)) {
-            Show::liteError('The swoft entry file is not exist');
+            Show::error('The application entry file is not exist');
+            return false;
+        }
+
+        $watchDirs = array_map(function ($name) {
+            $path = $this->targetPath . '/' . trim($name, '/ ');
+
+            if (!is_dir($path)) {
+                Show::warning("The want watched dir '{$path}' is not exist");
+                return '';
+            }
+
+            return $path;
+        }, $this->watchDir);
+
+        if (!$this->watchDir = array_filter($watchDirs)){
+            Show::error('Did not enter any valid monitoring directory');
             return false;
         }
 
@@ -162,24 +186,21 @@ class ServeCommand
      *     desc="List of directories you want to watch, relative the <cyan>targetPath</cyan>"
      * )
      * @param Input $input
+     * @param Output $output
      *
      * @example
      *   {binFile} run -c ws:start -b bin/swoft /path/to/php/swoft
      */
-    public function run(Input $input): void
+    public function run(Input $input, Output $output): void
     {
         if (!$this->collectInfo($input)) {
             return;
         }
 
         $fileName  = 'server-' . md5($this->entryFile) . '.id';
-        $watchDirs = array_map(function ($name) {
-            return $this->targetPath . '/' . $name;
-        }, $this->watchDir);
-
         // $mw = new ModifyWatcher(Sys::getTempDir() . '/' . $fileName));
         $mw = new ModifyWatcher(Swoft::getAlias('@runtime/' . $fileName));
-        $mw->watchDir($watchDirs);
+        $mw->watchDir($this->watchDir);
         $mw->initHash();
 
         Show::aList($mw->getWatchDir(), 'Watched Directories');
@@ -194,7 +215,9 @@ class ServeCommand
 
                 // Exit with error
                 if ($exitCode !== 0) {
-                    CliHelper::error('Server error exit');
+                    CliHelper::error('Server non-zero status exit');
+
+
                     return;
                 }
 
@@ -241,7 +264,7 @@ class ServeCommand
         $ok = false;
         // SIGTERM = 15
         $signal    = 15;
-        $timeout   = 30;
+        $timeout   = 45;
         $startTime = time();
 
         // retry stop if not stopped.

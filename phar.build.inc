@@ -22,7 +22,7 @@ $compiler
         'swoole-ide-helper',
     ])
     ->addFile([
-        'LICENSE',
+        // 'LICENSE',
         'composer.json',
         'README.md',
         'bin/bootstrap.php',
