@@ -217,8 +217,15 @@ class ServeCommand
                 if ($exitCode !== 0) {
                     CliHelper::error('Server non-zero status exit');
 
+                    $msg = $output->read('restart?(y/n) > ');
+                    if ($msg && 0 === stripos($msg, 'n')) {
+                        CliHelper::info('Exit');
+                        return;
+                    }
 
-                    return;
+                    CliHelper::info('will restart server');
+                    $pid = $this->startServer();
+                    continue;
                 }
 
                 if ($exitPid === $pid) {
