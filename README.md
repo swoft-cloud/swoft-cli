@@ -1,4 +1,4 @@
-# Swoft cli
+# Swoft CLI
 
 🛠️ CLI tool application for quick use swoft.
 
