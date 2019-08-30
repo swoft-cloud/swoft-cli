@@ -28,8 +28,8 @@ Add to global ENV PATH:
 
 ```bash
 # move to ENV path:
-mv swoftcli.phar /user/local/bin/swoftcli
-chmod a+x /user/local/bin/swoftcli
+mv swoftcli.phar /usr/local/bin/swoftcli
+chmod a+x /usr/local/bin/swoftcli
 
 # check
 swoftcli -V
