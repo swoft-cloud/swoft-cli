@@ -10,18 +10,20 @@ use Swoft\Console\Helper\Show;
  */
 class CliHelper
 {
+    public const PREFIX = '<cyan>[SWOFTCLI]</cyan>';
+
     public static function info(string $msg): void
     {
-        Show::writeln("[<cyan>SWOFTCLI</cyan>] <info>$msg</info>");
+        Show::writeln(self::PREFIX . " <info>$msg</info>");
     }
 
     public static function warn(string $msg): void
     {
-        Show::writeln("[<cyan>SWOFTCLI</cyan>] <warning>$msg</warning>");
+        Show::writeln(self::PREFIX . " <warning>$msg</warning>");
     }
 
     public static function error(string $msg): void
     {
-        Show::writeln("[<cyan>SWOFTCLI</cyan>] <error>$msg</error>");
+        Show::writeln(self::PREFIX . " <error>$msg</error>");
     }
 }
