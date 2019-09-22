@@ -10,7 +10,7 @@
 - Quick create new application skeleton
 - Quick create new component skeleton
 - Monitor file changes of the user's swoft project and automatically restart the server
-- Generate swoft class: http controller, ws controller, model and more class
+- Generate swoft class: http controller, http middleware, ws module, ws controller and more
 - More features ...
 
 > Documents on https://www.swoft.org/docs/2.x/zh-CN/tool/swoftcli/index.html
