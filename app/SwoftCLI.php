@@ -6,9 +6,8 @@ use Swoft;
 use Swoft\Stdlib\Helper\Sys;
 use Swoft\SwoftApplication;
 use function dirname;
-use function file_exists;
-use function getcwd;
 use function ini_set;
+use const PHP_VERSION_ID;
 
 /**
  * Class SwoftCLI
@@ -22,7 +21,7 @@ class SwoftCLI extends SwoftApplication
         $this->setRuntimePath(Sys::getTempDir());
 
         // fix: on php73 preg_* error
-        if (\PHP_VERSION_ID > 70300) {
+        if (PHP_VERSION_ID > 70300) {
             ini_set('pcre.jit', 'off');
         }
 

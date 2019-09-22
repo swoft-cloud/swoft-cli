@@ -7,6 +7,7 @@ use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Helper\Show;
+use function swoole_cpu_num;
 use const BASE_PATH;
 use const PHP_OS;
 use const PHP_VERSION;
@@ -31,7 +32,7 @@ class SystemCommand
         $info = [
             // "<bold>System environment info</bold>\n",
             'OS'             => PHP_OS,
-            'CPU number'     => \swoole_cpu_num(),
+            'CPU number'     => swoole_cpu_num(),
             'Php version'    => PHP_VERSION,
             'Swoole version' => SWOOLE_VERSION,
             'Swoft version'  => Swoft::VERSION,

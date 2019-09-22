@@ -13,11 +13,10 @@ use Swoft\Console\Output\Output;
 use Swoft\Tcp\Protocol;
 use Swoole\Coroutine\Client;
 use Swoole\Coroutine\Http\Client as HttpCoClient;
-use function json_decode;
 use const SWOOLE_SOCK_TCP;
 
 /**
- * Privide some commads for quick connect tcp, ws server
+ * Provide some commands for quick connect tcp, ws server
  *
  * @Command()
  */

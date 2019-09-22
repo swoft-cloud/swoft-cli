@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
-use Swoft\Http\Server\Swoole\RequestListener;
-use Swoft\Server\Swoole\SwooleEvent;
+// use Swoft\Http\Server\Swoole\RequestListener;
+// use Swoft\Server\Swoole\SwooleEvent;
 
 return [
     'cliRouter'     => [

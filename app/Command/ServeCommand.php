@@ -193,7 +193,8 @@ class ServeCommand
      * @param Output $output
      *
      * @example
-     *   {binFile} run -c ws:start -b bin/swoft /path/to/php/swoft
+     *   {binFile} run    Default, will start http server
+     *   {binFile} run -c ws:start -b bin/swoft /path/to/swoft
      */
     public function run(Input $input, Output $output): void
     {
