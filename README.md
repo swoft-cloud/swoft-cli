@@ -15,7 +15,7 @@
 
 > Documents on https://www.swoft.org/docs/2.x/zh-CN/tool/swoftcli/index.html
 
-![home](swoft-cli-home.png)
+![home](swoftcli-home.png)
 
 ## Install
 
