@@ -3,6 +3,7 @@
 namespace Swoft\Cli\Helper;
 
 use Swoft\Console\Helper\Show;
+use function date;
 
 /**
  * Class CliHelper
@@ -10,20 +11,20 @@ use Swoft\Console\Helper\Show;
  */
 class CliHelper
 {
-    public const PREFIX = '<cyan>[SWOFTCLI]</cyan>';
+    public const PREFIX = ' <cyan>[SWOFTCLI]</cyan>';
 
     public static function info(string $msg): void
     {
-        Show::writeln(self::PREFIX . " <info>$msg</info>");
+        Show::writeln(date('Y/m/d-H:i:s') . self::PREFIX . " <info>$msg</info>");
     }
 
     public static function warn(string $msg): void
     {
-        Show::writeln(self::PREFIX . " <warning>$msg</warning>");
+        Show::writeln(date('Y/m/d-H:i:s') . self::PREFIX . " <warning>$msg</warning>");
     }
 
     public static function error(string $msg): void
     {
-        Show::writeln(self::PREFIX . " <error>$msg</error>");
+        Show::writeln(date('Y/m/d-H:i:s') . self::PREFIX . " <error>$msg</error>");
     }
 }

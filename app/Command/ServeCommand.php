@@ -21,7 +21,6 @@ use function explode;
 use function file_exists;
 use function getmypid;
 use function md5;
-use function output;
 use function realpath;
 use function sleep;
 use function sprintf;
@@ -44,6 +43,11 @@ class ServeCommand
      * @var int
      */
     private $pid = 0;
+
+    /**
+     * @var int
+     */
+    private $retry = 0;
 
     /**
      * @var bool
@@ -98,10 +102,10 @@ class ServeCommand
         $this->phpBin = $input->getOpt('php-bin');
 
         if ($this->phpBin === 'php') {
-            [$ok, $ret, ] = Sys::run('which php');
+            [$ok, $ret,] = Sys::run('which php');
 
             if ($ok === 0) {
-                $this->phpBin = \trim($ret);
+                $this->phpBin = trim($ret);
             }
         }
 
@@ -155,7 +159,7 @@ class ServeCommand
             return $path;
         }, $this->watchDir);
 
-        if (!$this->watchDir = array_filter($watchDirs)){
+        if (!$this->watchDir = array_filter($watchDirs)) {
             Show::error('Did not enter any valid monitoring directory');
             return false;
         }
@@ -185,7 +189,7 @@ class ServeCommand
      *     "watch", short="w", default="app,config", type="directories",
      *     desc="List of directories you want to watch, relative the <cyan>targetPath</cyan>"
      * )
-     * @param Input $input
+     * @param Input  $input
      * @param Output $output
      *
      * @example
@@ -197,7 +201,7 @@ class ServeCommand
             return;
         }
 
-        $fileName  = 'server-' . md5($this->entryFile) . '.id';
+        $fileName = 'server-' . md5($this->entryFile) . '.id';
         // $mw = new ModifyWatcher(Sys::getTempDir() . '/' . $fileName));
         $mw = new ModifyWatcher(Swoft::getAlias('@runtime/' . $fileName));
         $mw->watchDir($this->watchDir);
@@ -211,32 +215,31 @@ class ServeCommand
             if ($ret = Process::wait(false)) {
                 $exitPid  = $ret['pid'];
                 $exitCode = $ret['code'];
-                CliHelper::warn("Server(pid $exitPid) exited (signal {$ret['signal']}, code $exitCode)");
-
-                // Exit with error
+                CliHelper::warn("Target server(pid $exitPid) exited (signal {$ret['signal']}, code $exitCode)");
                 if ($exitCode !== 0) {
                     CliHelper::error('Server non-zero status exit');
-
-                    $msg = $output->read('restart?(y/n) > ');
-                    if ($msg && 0 === stripos($msg, 'n')) {
-                        CliHelper::info('Exit');
-                        return;
-                    }
-
-                    CliHelper::info('will restart server');
-                    $pid = $this->startServer();
-                    continue;
                 }
 
-                if ($exitPid === $pid) {
-                    $pid = $this->startServer();
-                }
+                // if ($retry > 2) {
+                //     $msg = $output->read("Have auto try start server {$retry} times, restart?(y/n) >");
+                //     if ($msg && 0 === stripos($msg, 'n')) {
+                //         CliHelper::info('Exit');
+                //         return;
+                //     }
+                //
+                //     $retry = 0;
+                // }
+
+                CliHelper::info('Will try restart server ... after 3 seconds');
+                sleep(3);
+                $pid = $this->startServer();
+                continue;
             }
 
             if ($mw->isChanged()) {
                 CliHelper::info(date('Y/m/d H:i:s') . ': file changed!');
                 Show::aList($mw->getChangedInfo(), 'modify info');
-                CliHelper::info('will restart server');
+                CliHelper::info('Will restart server');
 
                 if (false === $this->stopServer($pid)) {
                     CliHelper::info('Exit');
@@ -245,7 +248,7 @@ class ServeCommand
 
                 $pid = $this->startServer();
             } elseif ($this->debug) {
-                CliHelper::info(date('Y/m/d H:i:s') . ': no change!');
+                CliHelper::info(date('Y/m/d H:i:s') . ': files no change!');
             }
 
             sleep($this->interval);
