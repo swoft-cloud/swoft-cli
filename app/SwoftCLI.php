@@ -14,6 +14,8 @@ use const PHP_VERSION_ID;
  */
 class SwoftCLI extends SwoftApplication
 {
+    public const VERSION = '0.1.2';
+
     protected function afterInit(): void
     {
         parent::afterInit();

@@ -2,16 +2,23 @@
 
 // use Swoft\Http\Server\Swoole\RequestListener;
 // use Swoft\Server\Swoole\SwooleEvent;
+use Swoft\Cli\SwoftCLI;
 
 return [
     'cliApp'     => [
         'name'        => 'Swoft-cli',
-        'version'     => '0.1.2',
+        'version'     => SwoftCLI::VERSION,
         'description' => 'CLI tool application for quick use swoft framework',
     ],
     'cliRouter'     => [
         'idAliases' => [
             // 'run' => 'serve:run'
+            'ab'          => 'tool:ab',
+            'upself'      => 'self-update:up',
+            'update-self' => 'self-update:up',
+            'updateself'  => 'self-update:up',
+            'selfupdate' => 'self-update:up',
+            'self-update' => 'self-update:up',
         ],
         'disabledGroups' => ['http', 'asset'],
     ],
