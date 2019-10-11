@@ -31,7 +31,7 @@ class SwoftCLI extends SwoftApplication
     public function getCLoggerConfig(): array
     {
         $config = parent::getCLoggerConfig();
-        // disable print console start log
+        // disable print console log
         $config['enable'] = false;
 
         return $config;

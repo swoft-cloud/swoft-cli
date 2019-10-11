@@ -76,7 +76,7 @@ class AssetCommand
         $assetDir  = alias($assetDir);
         $targetDir = alias($targetDir);
 
-        $force = \input()->sameOpt(['f', 'force'], false);
+        $force = $input->sameOpt(['f', 'force'], false);
 
         if ($force && is_dir($targetDir)) {
             output()->writeln("Will delete the old assets: $targetDir");
@@ -91,7 +91,7 @@ class AssetCommand
             }
         }
 
-        $yes     = \input()->sameOpt(['y', 'yes'], false);
+        $yes     = $input->sameOpt(['y', 'yes'], false);
         $command = "cp -Rf $assetDir $targetDir";
 
         output()->writeln("Will run shell command:\n $command");

@@ -4,6 +4,11 @@
 // use Swoft\Server\Swoole\SwooleEvent;
 
 return [
+    'cliApp'     => [
+        'name'        => 'Swoft-cli',
+        'version'     => '0.1.2',
+        'description' => 'CLI tool application for quick use swoft framework',
+    ],
     'cliRouter'     => [
         'idAliases' => [
             // 'run' => 'serve:run'

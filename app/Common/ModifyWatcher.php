@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Swoft\Cli\Bean;
+namespace Swoft\Cli\Common;
 
 use RuntimeException;
 use Swoft\Stdlib\Helper\Sys;

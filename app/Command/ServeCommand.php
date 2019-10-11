@@ -3,7 +3,7 @@
 namespace Swoft\Cli\Command;
 
 use Swoft;
-use Swoft\Cli\Bean\ModifyWatcher;
+use Swoft\Cli\Common\ModifyWatcher;
 use Swoft\Cli\Helper\CliHelper;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandArgument;
