@@ -6,18 +6,17 @@ use Swoft\Cli\SwoftCLI;
 
 return [
     'cliApp'     => [
-        'name'        => 'Swoft-cli',
+        'name'        => config('name'),
         'version'     => SwoftCLI::VERSION,
-        'description' => 'CLI tool application for quick use swoft framework',
+        'description' => config('description'),
     ],
     'cliRouter'     => [
         'idAliases' => [
             // 'run' => 'serve:run'
             'ab'          => 'tool:ab',
-            'upself'      => 'self-update:up',
             'update-self' => 'self-update:up',
             'updateself'  => 'self-update:up',
-            'selfupdate' => 'self-update:up',
+            'selfupdate'  => 'self-update:up',
             'self-update' => 'self-update:up',
         ],
         'disabledGroups' => ['http', 'asset'],

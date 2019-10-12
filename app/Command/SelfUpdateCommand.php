@@ -17,18 +17,18 @@ use function json_decode;
 use function parse_url;
 
 /**
- * update the swoft-cli to latest version from github releases
+ * update the swoft-cli to latest version from github
  *
- * @Command("self-update", alias="selfupdate, upself, update-self, updateself", coroutine=true)
+ * @Command("self-update", alias="selfupdate, update-self, updateself", coroutine=true)
  */
 class SelfUpdateCommand
 {
     public const LATEST_RELEASE_URL = 'https://api.github.com/repos/swoft-cloud/swoft-cli/releases/latest';
 
     /**
-     * update the swoft-cli to latest version from github releases
+     * update the swoft-cli to latest version from github
      *
-     * @CommandMapping(alias="selfupdate, upself, update-self, updateself")
+     * @CommandMapping(alias="selfupdate, update-self, updateself")
      * @CommandOption(
      *     "only-check", type="bool",
      *     desc="only fetch latest release information, but dont download and update package",
@@ -47,6 +47,39 @@ class SelfUpdateCommand
 
         $output->colored('Fetch latest release information for Github ...', 'cyan');
 
+        $result = $this->fetchInfo();
+        $latest = json_decode($result, true);
+        if (!$latest) {
+            Show::error('Failed for update: fetch latest version info failed');
+            return;
+        }
+
+        $tagName  = $latest['tag_name'];
+        $metaInfo = [
+            'local version'  => 'v' . SwoftCLI::VERSION,
+            'latest version' => $tagName,
+            'created at'     => $latest['created_at'],
+            'published at'   => $latest['published_at'],
+        ];
+
+        Show::aList($metaInfo, 'latest release information');
+        if ($input->getOpt('only-check')) {
+            return;
+        }
+
+        // get phar download address.
+        if (!isset($latest['assets'][0]['browser_download_url'])) {
+            Show::error('Failed for update: not found latest phar package download url');
+            return;
+        }
+
+        $pharUrl = $latest['assets'][0]['browser_download_url'];
+
+        Download::file($pharUrl);
+    }
+
+    private function fetchInfo(): string
+    {
         $info = $this->parseUrl(self::LATEST_RELEASE_URL);
         $port = (int)$info['port'];
         $path = $info['path'];
@@ -63,36 +96,7 @@ class SelfUpdateCommand
         // close connection
         $client->close();
 
-        $latest = json_decode($result, true);
-        if (!$latest) {
-            Show::error('Failed for update swoft-cli: fetch latest version info failed');
-            return;
-        }
-
-        $tagName = $latest['tag_name'];
-
-        $metaInfo = [
-            'local version'  => 'v' . SwoftCLI::VERSION,
-            'latest version' => $tagName,
-            'created at'     => $latest['created_at'],
-            'published at'   => $latest['published_at'],
-        ];
-
-        Show::aList($metaInfo, 'latest release information');
-
-        if ($input->getOpt('only-check')) {
-            return;
-        }
-
-        // get phar download address.
-        if (!isset($latest['assets'][0]['browser_download_url'])) {
-            Show::error('Failed for update swoft-cli: not found latest phar package download url');
-            return;
-        }
-
-        $pharUrl = $latest['assets'][0]['browser_download_url'];
-
-        Download::file($pharUrl);
+        return $result;
     }
 
     /**
@@ -100,7 +104,7 @@ class SelfUpdateCommand
      *
      * @return array
      */
-    public function parseUrl(string $url): array
+    private function parseUrl(string $url): array
     {
         $info = parse_url($url);
 
