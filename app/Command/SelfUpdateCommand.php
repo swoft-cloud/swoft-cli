@@ -30,13 +30,13 @@ class SelfUpdateCommand
      *
      * @CommandMapping(alias="selfupdate, update-self, updateself")
      * @CommandOption(
-     *     "only-check", type="bool",
+     *     "check", type="bool",
      *     desc="only fetch latest release information, but dont download and update package",
      * )
      * @param Input  $input
      * @param Output $output
      */
-    public function up(Input $input, Output $output): void
+    public function down(Input $input, Output $output): void
     {
         $output->colored('Current Version: ' . SwoftCLI::VERSION);
 
@@ -45,7 +45,7 @@ class SelfUpdateCommand
 
         // $jsonText = file_get_contents(self::LATEST_RELEASE_URL);
 
-        $output->colored('Fetch latest release information for Github ...', 'cyan');
+        $output->colored('> Fetch latest release information for Github ...', 'cyan');
 
         $result = $this->fetchInfo();
         $latest = json_decode($result, true);
@@ -63,7 +63,7 @@ class SelfUpdateCommand
         ];
 
         Show::aList($metaInfo, 'latest release information');
-        if ($input->getOpt('only-check')) {
+        if ($input->getOpt('check')) {
             return;
         }
 

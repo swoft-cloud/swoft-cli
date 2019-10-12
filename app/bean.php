@@ -14,10 +14,10 @@ return [
         'idAliases' => [
             // 'run' => 'serve:run'
             'ab'          => 'tool:ab',
-            'update-self' => 'self-update:up',
-            'updateself'  => 'self-update:up',
-            'selfupdate'  => 'self-update:up',
-            'self-update' => 'self-update:up',
+            'update-self' => 'self-update:down',
+            'updateself'  => 'self-update:down',
+            'selfupdate'  => 'self-update:down',
+            'self-update' => 'self-update:down',
         ],
         'disabledGroups' => ['http', 'asset'],
     ],
