@@ -15,6 +15,21 @@ use const PHP_VERSION_ID;
 class SwoftCLI extends SwoftApplication
 {
     public const VERSION = '0.1.3';
+    
+    public const CLI_LOGO = '
+   _____               ______     ________    ____
+  / ___/      ______  / __/ /_   / ____/ /   /  _/
+  \__ \ | /| / / __ \/ /_/ __/  / /   / /    / /
+ ___/ / |/ |/ / /_/ / __/ /_   / /___/ /____/ /
+/____/|__/|__/\____/_/  \__/   \____/_____/___/
+';
+
+    public const CLI_LOGO_SMALL = '
+   ____            _____    _______   ____
+  / __/    _____  / _/ /_  / ___/ /  /  _/
+ _\ \| |/|/ / _ \/ _/ __/ / /__/ /___/ /
+/___/|__,__/\___/_/ \__/  \___/____/___/
+';
 
     protected function afterInit(): void
     {
