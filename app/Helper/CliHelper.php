@@ -3,6 +3,7 @@
 namespace Swoft\Cli\Helper;
 
 use Swoft\Console\Helper\Show;
+use Swoft\Stdlib\Helper\Sys;
 use function date;
 
 /**
@@ -35,5 +36,16 @@ class CliHelper
     public static function error(string $msg): void
     {
         Show::writeln(date('Y/m/d-H:i:s') . self::PREFIX . " <error>$msg</error>");
+    }
+
+    /**
+     * @return string
+     */
+    public static function getGitVersion(): string
+    {
+        // $checkCmd = "sh -c 'git version'";
+        $checkCmd = 'git version';
+
+        return Sys::execute($checkCmd, false);
     }
 }

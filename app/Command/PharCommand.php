@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
+use Swoft\Cli\Helper\CliHelper;
 use Swoft\Console\Advanced\PharCompiler;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
@@ -15,6 +16,7 @@ use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Str;
+use Swoft\Stdlib\Helper\Sys;
 use function filesize;
 use function input;
 use function is_file;
@@ -72,6 +74,8 @@ class PharCommand
             'project'   => $dir,
             'phar file' => $pharFile,
         ], 'Building Information');
+
+        // var_dump(CliHelper::getGitVersion());die;
 
         // use fast build
         if ($input->getBoolOpt('fast')) {
