@@ -16,7 +16,6 @@ use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Dir;
 use Swoft\Stdlib\Helper\Str;
-use Swoft\Stdlib\Helper\Sys;
 use function filesize;
 use function input;
 use function is_file;
@@ -75,7 +74,14 @@ class PharCommand
             'phar file' => $pharFile,
         ], 'Building Information');
 
-        // var_dump(CliHelper::getGitVersion());die;
+        // git version 2.23.0
+        $gitver = CliHelper::getGitVersion();
+        $hasGit = preg_match('/git version ([\d.]+)/', $gitver, $ms) === 1;
+        // $gVersion = $hasGit ? $ms[1] : '';
+
+        if (!$hasGit) {
+            $cpr->collectVersion(false);
+        }
 
         // use fast build
         if ($input->getBoolOpt('fast')) {
