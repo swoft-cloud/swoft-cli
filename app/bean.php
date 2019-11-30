@@ -8,6 +8,7 @@ return [
     'cliApp'     => [
         'name'        => config('name'),
         'version'     => SwoftCLI::VERSION,
+        'logoText'    => SwoftCLI::CLI_LOGO,
         'description' => config('description'),
     ],
     'cliRouter'     => [

@@ -3,16 +3,14 @@
 namespace Swoft\Cli\Command;
 
 use Swoft\Cli\SwoftCLI;
-use Swoft\Console\Helper\Show;
 use Swoft\Console\Annotation\Mapping\Command;
-use Swoft\Console\Annotation\Mapping\CommandArgument;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
+use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
 use Swoole\Coroutine\Http\Client;
 use Toolkit\Cli\Download;
-use function file_get_contents;
 use function json_decode;
 use function parse_url;
 
