@@ -14,7 +14,7 @@ use const PHP_VERSION_ID;
  */
 class SwoftCLI extends SwoftApplication
 {
-    public const VERSION = '0.1.4';
+    public const VERSION = '0.1.5';
 
     public const CLI_LOGO = '
    _____               ______     ________    ____
