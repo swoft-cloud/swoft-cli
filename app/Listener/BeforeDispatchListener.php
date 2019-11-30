@@ -10,6 +10,7 @@
 
 namespace Swoft\Cli\Listener;
 
+use Swoft\Cli\Helper\CliHelper;
 use Swoft\Console\Application;
 use Swoft\Console\ConsoleEvent;
 use Swoft\Event\Annotation\Mapping\Listener;
@@ -18,11 +19,11 @@ use Swoft\Event\EventInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class BeforeConsoleRunListener - event handler
+ * Class BeforeDispatchListener - event handler
  *
- * @Listener(ConsoleEvent::RUN_BEFORE)
+ * @Listener(ConsoleEvent::DISPATCH_BEFORE)
  */
-class BeforeConsoleRunListener implements EventHandlerInterface
+class BeforeDispatchListener implements EventHandlerInterface
 {
     /**
      * @param EventInterface $event
@@ -32,6 +33,8 @@ class BeforeConsoleRunListener implements EventHandlerInterface
         $configFile = getcwd() . '/swoftcli.yml';
 
         if (file_exists($configFile)) {
+            CliHelper::info('find config file(swoftcli.yml) in work directory, will load it');
+
             /** @var Application $app */
             $app  = $event->getTarget();
             $data = Yaml::parseFile($configFile);

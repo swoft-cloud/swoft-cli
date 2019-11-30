@@ -11,7 +11,6 @@ use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
-use Swoft\Console\Output\Output;
 use Swoft\Stdlib\Helper\Sys;
 use Swoole\Process;
 use function array_filter;
@@ -39,16 +38,6 @@ use function trim;
  */
 class ServeCommand
 {
-    /**
-     * @var int
-     */
-    private $pid = 0;
-
-    /**
-     * @var int
-     */
-    private $retry = 0;
-
     /**
      * @var bool
      */
@@ -96,18 +85,16 @@ class ServeCommand
      */
     private function collectInfo(Input $input): bool
     {
+        $config  = [];
         $workDir = $input->getPwd();
 
-        $this->debug  = $input->getBoolOpt('debug');
-        $this->phpBin = $input->getOpt('php-bin');
-
-        if ($this->phpBin === 'php') {
-            [$ok, $ret,] = Sys::run('which php');
-
-            if ($ok === 0) {
-                $this->phpBin = trim($ret);
-            }
+        $appParam = bean('cliApp')->get('commands');
+        if (isset($appParam['serve:run'])) {
+            $config = $appParam['serve:run'];
         }
+
+        $this->debug  = $input->getBoolOpt('debug');
+        $this->phpBin = $this->findPhpBinFile($config['php-bin'] ?? '', $input);
 
         $interval = (int)$input->getOpt('interval', 3);
         if ($interval < 0 || $interval > 15) {
@@ -115,10 +102,22 @@ class ServeCommand
         }
 
         $this->interval = $interval;
-        $this->binFile  = $input->getSameOpt(['bin-file', 'b']);
-        $this->startCmd = $input->getSameOpt(['start-cmd', 'c']);
 
-        if ($nameString = $input->getSameOpt(['watch-dir', 'w'])) {
+        if (!empty($config['bin-file'])) {
+            $this->binFile = $config['bin-file'];
+        } else {
+            $this->binFile = $input->getSameOpt(['bin-file', 'b']);
+        }
+
+        if (!empty($config['start-cmd'])) {
+            $this->startCmd = $config['start-cmd'];
+        } else {
+            $this->startCmd = $input->getSameOpt(['start-cmd', 'c']);
+        }
+
+        if (!empty($config['watch-dir'])) {
+            $this->watchDir = explode(',', $config['watch-dir']);
+        } elseif ($nameString = $input->getSameOpt(['watch-dir', 'w'])) {
             $this->watchDir = explode(',', str_replace(' ', '', $nameString));
         }
 
@@ -168,6 +167,30 @@ class ServeCommand
     }
 
     /**
+     * @param string $phpBin
+     * @param Input  $input
+     *
+     * @return string
+     */
+    private function findPhpBinFile(string $phpBin, Input $input): string
+    {
+        if (!$phpBin) {
+            $phpBin = $input->getStringOpt('php-bin');
+        }
+
+        if ($phpBin === 'php') {
+            // TODO use `type php` check and find
+            [$ok, $ret,] = Sys::run('which php');
+
+            if ($ok === 0) {
+                $phpBin = trim($ret);
+            }
+        }
+
+        return $phpBin;
+    }
+
+    /**
      * Start the swoft server and monitor the file changes to restart the server
      *
      * @CommandMapping()
@@ -189,14 +212,13 @@ class ServeCommand
      *     "watch", short="w", default="app,config", type="directories",
      *     desc="List of directories you want to watch, relative the <cyan>targetPath</cyan>"
      * )
-     * @param Input  $input
-     * @param Output $output
+     * @param Input $input
      *
      * @example
      *   {binFile} run    Default, will start http server
      *   {binFile} run -c ws:start -b bin/swoft /path/to/swoft
      */
-    public function run(Input $input, Output $output): void
+    public function run(Input $input): void
     {
         if (!$this->collectInfo($input)) {
             return;
