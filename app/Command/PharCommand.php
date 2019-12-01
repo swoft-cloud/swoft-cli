@@ -11,6 +11,7 @@ use Swoft\Console\Advanced\PharCompiler;
 use Swoft\Console\Annotation\Mapping\Command;
 use Swoft\Console\Annotation\Mapping\CommandMapping;
 use Swoft\Console\Annotation\Mapping\CommandOption;
+use Swoft\Console\Console;
 use Swoft\Console\Helper\Show;
 use Swoft\Console\Input\Input;
 use Swoft\Console\Output\Output;
@@ -120,6 +121,7 @@ class PharCommand
             });
             $cpr->on(PharCompiler::ON_COLLECTED, function () use ($counter) {
                 $counter->send(-1);
+                Console::writeln('');
             });
         }
 
@@ -129,10 +131,10 @@ class PharCommand
 
         $info = [
             PHP_EOL . '<success>Phar Build Completed!</success>',
-            " - Phar File: $pharFile",
-            ' - Phar Size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
-            ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
             ' - Pack File: ' . $cpr->getCounter(),
+            ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
+            ' - Phar Size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
+            " - Phar File: $pharFile",
             ' - Commit ID: ' . $cpr->getLastCommit(),
         ];
         $output->writeln($info);
