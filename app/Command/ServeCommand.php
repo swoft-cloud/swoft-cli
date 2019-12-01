@@ -260,8 +260,8 @@ class ServeCommand
             }
 
             if ($mw->isChanged()) {
-                CliHelper::info(date('Y/m/d H:i:s') . ': file changed!');
-                Show::aList($mw->getChangedInfo(), 'modify info');
+                CliHelper::info('Have changed files');
+                Show::aList($mw->getChangedInfo(), 'changed file');
                 CliHelper::info('Will restart server');
 
                 if (false === $this->stopServer($pid)) {
@@ -271,7 +271,7 @@ class ServeCommand
 
                 $pid = $this->startServer();
             } elseif ($this->debug) {
-                CliHelper::info(date('Y/m/d H:i:s') . ': files no change!');
+                CliHelper::info('files no change!');
             }
 
             sleep($this->interval);
@@ -290,7 +290,12 @@ class ServeCommand
         return $p->start();
     }
 
-    public function stopServer(int $pid): bool
+    /**
+     * @param int $pid
+     *
+     * @return bool
+     */
+    protected function stopServer(int $pid): bool
     {
         CliHelper::info('Stop old server. PID ' . $pid);
 
