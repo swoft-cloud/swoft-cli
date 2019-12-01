@@ -15,7 +15,7 @@
     "ext-json": "*",
     "ext-mbstring": "*",
     "seld/phar-utils": "^1.0",
-    "swoft/framework": "~2.0.1",
+    "swoft/framework": "~2.0.8",
     "swoft/tcp": "~2.0.1",
     "swoft/http-server": "~2.0.0",
     "swoftlabs/common-devtool": "dev-master as 1.0"

@@ -98,22 +98,28 @@ class PharCommand
         $cpr->onError(function ($error) {
             output()->writeln("<warning>$error</warning>");
         });
+        $cpr->on(PharCompiler::ON_MESSAGE, function ($msg) {
+            output()->colored('> ' . $msg);
+        });
 
-        $counter = null;
+        $output->colored('Collect Pack files', 'comment');
         if ($input->getOpt('debug')) {
-            $output->info('Pack file to Phar ... ...');
-            $cpr->onAdd(function ($path) {
+            // $output->info('Pack file to Phar ... ...');
+            $cpr->onAdd(function (string $path) {
                 output()->writeln(" <info>+</info> $path");
             });
 
             $cpr->on('skip', function (string $path, bool $isFile) {
-                output()->writeln(" <red>-</red> $path" . ($isFile ? '[F]' : '[D]'));
+                $mark = $isFile ? '[F]' : '[D]';
+                output()->writeln(" <red>-</red> $path <info>$mark</info>");
             });
         } else {
-            $output->info('Pack file to Phar:');
-            $counter = Show::counterTxt('<info>File Packing ...</info>', 'Done.');
+            $counter = Show::counterTxt('Collecting ...', 'Done.');
             $cpr->onAdd(function () use ($counter) {
                 $counter->send(1);
+            });
+            $cpr->on(PharCompiler::ON_COLLECTED, function () use ($counter) {
+                $counter->send(-1);
             });
         }
 
@@ -121,15 +127,10 @@ class PharCommand
         $refresh = $input->getBoolOpt('refresh');
         $cpr->pack($pharFile, $refresh);
 
-        // end
-        if ($counter) {
-            $counter->send(-1);
-        }
-
         $info = [
             PHP_EOL . '<success>Phar Build Completed!</success>',
-            " - Phar file: $pharFile",
-            ' - Phar size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
+            " - Phar File: $pharFile",
+            ' - Phar Size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
             ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
             ' - Pack File: ' . $cpr->getCounter(),
             ' - Commit ID: ' . $cpr->getLastCommit(),
