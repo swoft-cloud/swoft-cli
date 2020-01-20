@@ -5,7 +5,7 @@
 [![Swoft Doc](https://img.shields.io/badge/docs-passing-green.svg?maxAge=2592000)](https://www.swoft.org/docs)
 [![Swoft License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/swoft-cloud/swoft/blob/master/LICENSE)
 
-**[EN README](README.md)**
+> **[EN README](README.md)**
 
 🛠️ Swoft CLI 是一个独立的命令行应用包，提供了一些内置的工具方便开发者使用。
 
