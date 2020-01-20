@@ -26,7 +26,7 @@ Download phar from github releases page
 ```bash
 # wget https://github.com/swoft-cloud/swoft-cli/releases/download/{VERSION}/swoftcli.phar
 # eg
-wget https://github.com/swoft-cloud/swoft-cli/releases/download/v0.2.6/swoftcli.phar
+wget https://github.com/swoft-cloud/swoft-cli/releases/download/v0.2.1/swoftcli.phar
 
 # quick check
 php swoftcli.phar -V
