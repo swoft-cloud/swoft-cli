@@ -48,18 +48,19 @@ jobs:
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
-    - name: Run test suite
-      run: composer test0
+    - name: Run tests and build phar
+      run: |
+        composer test0
+        php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
 
     - name: Deploy release assets
       if: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
-      run: php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
       uses: xresloader/upload-to-github-release@v1
       with:
         # The files or file patterns to upload. You can upload multiple files by split them by semicolon. You can use the glob pattern to find the files.
         file: swoftcli.phar # default is
         # If you need to overwrite existing files, add overwrite: true to the with.
-        overwrite: # optional, default is false
+        overwrite: false # optional, default is false
         # The resultant deployment is a draft Release that only repository collaborators can see. This gives you an opportunity to examine and edit the draft release.
         draft: false # optional, default is true
         # The resultant deployment is a Prerelease. This gives you an opportunity to examine and edit the prerelease.
@@ -69,8 +70,8 @@ jobs:
         # Only work on these branches(splited by semicolon), set to nothing to accept all branches.
         branches: master # optional, default is
         # With verbose: true, be verbose.
-        verbose: # optional, default is false
+        verbose: false # optional, default is false
         # Set custom tag name.
-        tag_name: # optional, default is
+        tag_name: '' # optional, default is
         # If try to update latest release.
-        update_latest_release: # optional, default is false
+        update_latest_release: false # optional, default is false
