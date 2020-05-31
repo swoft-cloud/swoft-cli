@@ -52,7 +52,7 @@ jobs:
       run: composer test0
 
     - name: Deploy release assets
-      If: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
+      if: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
       run: php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
       uses: xresloader/upload-to-github-release@v1
       with:
