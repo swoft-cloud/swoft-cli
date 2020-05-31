@@ -1,0 +1,76 @@
+name: PHP-CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Test on php ${{ matrix.php}} and ${{ matrix.os }} OS
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      SWOFT_DEBUG: 0
+    strategy:
+      fail-fast: true # dont fast fail
+      matrix:
+        php: [7.1, 7.2, 7.3, 7.4]
+        os: [ubuntu-latest] # , macOS-latest, windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install swoole extensions
+      timeout-minutes: 5
+      run: |
+          sudo pecl install -f swoole-4.4.19 && php -m
+      # echo 'no' | pecl install -f redis
+      # sudo pecl update-channels && pecl install -f msgpack && pecl install -f igbinary && php -m
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v2
+      with:
+        path: vendor
+        key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Install dependencies
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+    # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+    - name: Run test suite
+      run: composer test0
+
+    - name: Deploy release assets
+      If: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
+      run: php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
+      uses: xresloader/upload-to-github-release@v1
+      with:
+        # The files or file patterns to upload. You can upload multiple files by split them by semicolon. You can use the glob pattern to find the files.
+        file: swoftcli.phar # default is
+        # If you need to overwrite existing files, add overwrite: true to the with.
+        overwrite: # optional, default is false
+        # The resultant deployment is a draft Release that only repository collaborators can see. This gives you an opportunity to examine and edit the draft release.
+        draft: false # optional, default is true
+        # The resultant deployment is a Prerelease. This gives you an opportunity to examine and edit the prerelease.
+        prerelease: false # optional, default is false
+        # With tags: true, your Releases deployment will trigger if and only if the build is a tagged build.
+        tags: true # optional, default is false
+        # Only work on these branches(splited by semicolon), set to nothing to accept all branches.
+        branches: master # optional, default is
+        # With verbose: true, be verbose.
+        verbose: # optional, default is false
+        # Set custom tag name.
+        tag_name: # optional, default is
+        # If try to update latest release.
+        update_latest_release: # optional, default is false
