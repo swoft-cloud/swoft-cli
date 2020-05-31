@@ -65,27 +65,27 @@ jobs:
         composer test0
         php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
 
-    - name: Deploy release assets
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      if: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
-      uses: xresloader/upload-to-github-release@v1
-      with:
-        # The files or file patterns to upload. You can upload multiple files by split them by semicolon. You can use the glob pattern to find the files.
-        file: swoftcli.phar # default is
-        # If you need to overwrite existing files, add overwrite: true to the with.
-        overwrite: false # optional, default is false
-        # The resultant deployment is a draft Release that only repository collaborators can see. This gives you an opportunity to examine and edit the draft release.
-        draft: false # optional, default is true
-        # The resultant deployment is a Prerelease. This gives you an opportunity to examine and edit the prerelease.
-        prerelease: false # optional, default is false
-        # With tags: true, your Releases deployment will trigger if and only if the build is a tagged build.
-        tags: true # optional, default is false
-        # Only work on these branches(splited by semicolon), set to nothing to accept all branches.
-        branches: master # optional, default is
-        # With verbose: true, be verbose.
-        verbose: false # optional, default is false
-        # Set custom tag name.
-        tag_name: '' # optional, default is
-        # If try to update latest release.
-        update_latest_release: false # optional, default is false
+#     - name: Deploy release assets
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       if: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
+#       uses: xresloader/upload-to-github-release@v1
+#       with:
+#         # The files or file patterns to upload. You can upload multiple files by split them by semicolon. You can use the glob pattern to find the files.
+#         file: swoftcli.phar # default is
+#         # If you need to overwrite existing files, add overwrite: true to the with.
+#         overwrite: false # optional, default is false
+#         # The resultant deployment is a draft Release that only repository collaborators can see. This gives you an opportunity to examine and edit the draft release.
+#         draft: false # optional, default is true
+#         # The resultant deployment is a Prerelease. This gives you an opportunity to examine and edit the prerelease.
+#         prerelease: false # optional, default is false
+#         # With tags: true, your Releases deployment will trigger if and only if the build is a tagged build.
+#         tags: true # optional, default is false
+#         # Only work on these branches(splited by semicolon), set to nothing to accept all branches.
+#         branches: master # optional, default is
+#         # With verbose: true, be verbose.
+#         verbose: false # optional, default is false
+#         # Set custom tag name.
+#         tag_name: '' # optional, default is
+#         # If try to update latest release.
+#         update_latest_release: false # optional, default is false
