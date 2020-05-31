@@ -4,6 +4,7 @@
 [![Php Version](https://img.shields.io/badge/php-%3E=7.1-brightgreen.svg?maxAge=2592000)](https://secure.php.net/)
 [![Swoft Doc](https://img.shields.io/badge/docs-passing-green.svg?maxAge=2592000)](https://www.swoft.org/docs)
 [![Swoft License](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)](https://github.com/swoft-cloud/swoft/blob/master/LICENSE)
+[![PHP-CI](https://github.com/swoft-cloud/swoft-cli/workflows/PHP-CI/badge.svg)](https://github.com/swoft-cloud/swoft-cli/actions)
 
 > **[中文说明](README.zh-CN.md)**
 
