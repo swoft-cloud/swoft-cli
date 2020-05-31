@@ -66,6 +66,8 @@ jobs:
         php -d phar.readonly=0 bin/swoftcli phar:pack -o=swoftcli.phar --no-progress
 
     - name: Deploy release assets
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: matrix.php == '7.3' && matrix.os == 'ubuntu-latest' # run once
       uses: xresloader/upload-to-github-release@v1
       with:
