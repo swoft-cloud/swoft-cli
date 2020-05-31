@@ -44,6 +44,7 @@ class PharCommand
      * @CommandOption("output", short="o", desc="Setting the output file name", type="string", default="app.phar")
      * @CommandOption("config", short="c", type="string", desc="Use the defined config file for build phar")
      * @CommandOption("files", type="string", desc="only pack the list files to the exist phar, multi use ',' split")
+     * @CommandOption("no-progress", type="bool", desc="disable output progress on the runtime")
      * @param Input  $input
      * @param Output $output
      *
@@ -104,6 +105,36 @@ class PharCommand
         });
 
         $output->colored('Collect Pack files', 'comment');
+        $this->outputProgress($cpr, $input, $output);
+
+        // packing ...
+        $refresh = $input->getBoolOpt('refresh');
+        $cpr->pack($pharFile, $refresh);
+
+        $info = [
+            PHP_EOL . '<success>Phar Build Completed!</success>',
+            ' - Pack File: ' . $cpr->getCounter(),
+            ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
+            ' - Phar Size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
+            " - Phar File: $pharFile",
+            ' - Commit ID: ' . $cpr->getLastCommit(),
+        ];
+        $output->writeln($info);
+
+        return 0;
+    }
+
+    /**
+     * @param Input $input
+     * @param Output $output
+     * @return void
+     */
+    private function outputProgress(PharCompiler $cpr,Input $input, Output $output): void
+    {
+        if ($input->getBoolOpt('no-progress')) {
+            return;
+        }
+
         if ($input->getOpt('debug')) {
             // $output->info('Pack file to Phar ... ...');
             $cpr->onAdd(function (string $path) {
@@ -124,22 +155,6 @@ class PharCommand
                 Console::writeln('');
             });
         }
-
-        // packing ...
-        $refresh = $input->getBoolOpt('refresh');
-        $cpr->pack($pharFile, $refresh);
-
-        $info = [
-            PHP_EOL . '<success>Phar Build Completed!</success>',
-            ' - Pack File: ' . $cpr->getCounter(),
-            ' - Pack Time: ' . round(microtime(true) - $startAt, 3) . ' s',
-            ' - Phar Size: ' . round(filesize($pharFile) / 1024 / 1024, 2) . ' Mb',
-            " - Phar File: $pharFile",
-            ' - Commit ID: ' . $cpr->getLastCommit(),
-        ];
-        $output->writeln($info);
-
-        return 0;
     }
 
     /**
