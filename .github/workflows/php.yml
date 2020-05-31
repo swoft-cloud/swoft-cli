@@ -20,14 +20,18 @@ jobs:
         os: [ubuntu-latest] # , macOS-latest, windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
-    - name: Install swoole extensions
+    - name: Setup PHP Env
       timeout-minutes: 5
-      run: |
-          sudo pecl install -f swoole-4.4.19 && php -m
-      # echo 'no' | pecl install -f redis
-      # sudo pecl update-channels && pecl install -f msgpack && pecl install -f igbinary && php -m
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php}}
+        tools: pecl, php-cs-fixer, phpunit
+        extensions: mbstring, dom, fileinfo, mysql, openssl, redis, swoole-4.4.19 #optional, setup extensions
+        ini-values: post_max_size=56M, short_open_tag=On #optional, setup php.ini configuration
+        coverage: none #optional, setup coverage driver: xdebug, none
 
     - name: Validate composer.json and composer.lock
       run: composer validate
